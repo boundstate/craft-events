@@ -1,0 +1,58 @@
+{%- from 'macros/type.twig' import formatType -%}
+{%- from 'macros/warning.twig' import deprecationWarning -%}
+
+{%- autoescape false -%}
+
+{%- block content -%}
+
+{{- include('partials/header.md.twig', { node }) }}
+
+{%- set inheritance = [] %}
+
+{%- if node.parent -%}
+  {%- set inheritance = [...inheritance, 'Extends ' ~ formatType(node.parent, { md: true, relativeTo: node })] -%}
+{%- endif -%}
+
+{%- if node.interfaces is not empty -%}
+  {%- set inheritance = [...inheritance, 'Implements ' ~ node.interfaces|map(node => formatType(node, { md: true, relativeTo: node }))|join(', ')] -%}
+{% endif %}
+
+{%- if inheritance %}
+  <small class="block">{{ inheritance|join(', ') }}</small>
+{% endif -%}
+
+{% if node.cases is not empty -%}
+  ## Cases
+
+  {%~ for case in node.cases -%}
+    {%- set description = include('partials/description.md.twig', { node: case }) -%}
+    {{~ '- `' ~ case.name ~ '`' ~ (description|trim ? ' - ' ~ description|trim) }}
+  {%~ endfor %}
+{% endif %}
+
+{% if node.constants is not empty -%}
+  ## Constants
+
+  {%~ for constant in node.constants -%}
+    {{~ include('partials/constant.md.twig') }}
+  {%~ endfor %}
+{% endif %}
+
+{% if node.properties is not empty -%}
+  ## Properties
+
+  {%~ for property in node.properties %}
+    {{~ include('partials/property.md.twig') }}
+  {%~ endfor %}
+{% endif %}
+
+{% if node.methods is not empty -%}
+  ## Methods
+
+  {%~ for method in node.methods %}
+    {{~ include('partials/method.md.twig') }}
+  {%~ endfor %}
+{% endif %}
+
+{% endblock %}
+{% endautoescape %}

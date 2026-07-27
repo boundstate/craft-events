@@ -1,0 +1,53 @@
+{
+  "name": "boundstate/eventful",
+  "version": "0.0.0",
+  "type": "craft-plugin",
+  "license": "proprietary",
+  "require": {
+    "ext-zip": "*",
+    "php": ">=8.2",
+    "craftcms/cms": "^5.10.0",
+    "sabre/vobject": "^4.5",
+    "simshaun/recurr": "^5.0"
+  },
+  "require-dev": {
+    "craftcms/commerce": "^5.7",
+    "craftcms/generator": "^2.1",
+    "craftcms/phpstan": "dev-main",
+    "craftcms/rector": "dev-main",
+    "laravel/pint": "^1.29",
+    "phpdocumentor/shim": "^3.10",
+    "rector/rector": "^1.2",
+    "vlucas/phpdotenv": "^5.4.0",
+    "yiisoft/yii2-shell": "^2.0.3"
+  },
+  "autoload": {
+    "psr-4": {
+      "boundstate\\eventful\\": "src/"
+    }
+  },
+  "extra": {
+    "handle": "eventful",
+    "name": "Eventful",
+    "developer": "Bound State Software",
+    "documentationUrl": "https://eventful.boundstate.co",
+    "class": "boundstate\\eventful\\Eventful"
+  },
+  "config": {
+    "sort-packages": true,
+    "optimize-autoloader": true,
+    "platform": {
+      "php": "8.2"
+    },
+    "allow-plugins": {
+      "craftcms/plugin-installer": true,
+      "phpdocumentor/shim": true,
+      "yiisoft/yii2-composer": true
+    }
+  },
+  "scripts": {
+    "phpdoc": "rm -Rf docs/reference && vendor/bin/phpdoc && mv docs/api/boundstate/eventful docs/reference && rm -Rf docs/api && npx prettier --write docs/reference --log-level warn",
+    "phpstan": "phpstan --memory-limit=1G",
+    "rector": "vendor/bin/rector"
+  }
+}

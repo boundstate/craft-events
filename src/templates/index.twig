@@ -1,0 +1,275 @@
+{% import '_includes/forms' as forms %}
+
+{% set title = 'Events' %}
+
+{% extends '_layouts/cp.twig' %}
+
+{% if craft.app.isMultiSite %}
+  {% if selectableSites is not defined %}
+    {% if siteIds is defined %}
+      {% set selectableSites = craft.app.sites.getEditableSites()|filter(s => s.id in siteIds) %}
+    {% else %}
+      {% set selectableSites = craft.app.sites.getEditableSites() %}
+    {% endif %}
+  {% endif %}
+
+  {% if selectedSite is not defined %}
+    {% if selectedSiteId is defined %}
+      {% set selectedSite = craft.app.sites.getSiteById(selectedSiteId) %}
+    {% elseif requestedSite and requestedSite in selectableSites %}
+      {% set selectedSite = requestedSite %}
+    {% else %}
+      {% set selectedSite = selectableSites|length ? selectableSites|first : craft.app.sites.getPrimarySite() %}
+    {% endif %}
+  {% endif %}
+
+  {% set docTitle = "#{title} - #{selectedSite.uiLabel}" %}
+  {% set siteMenuItems = siteMenuItems(selectableSites, selectedSite) %}
+
+  {% set crumbs = (crumbs ?? [])|unshift({
+    id: 'site-crumb',
+    icon: 'world',
+    iconAltText: 'Site'|t('app'),
+    label: selectedSite.name|t('site'),
+    menu: {
+      items: siteMenuItems,
+      label: 'Select site'|t('app')
+    }
+  }) %}
+{% endif %}
+
+{% block header %}
+  {% if sources|length > 1 %}
+    <div id="page-title" class="has-toolbar">
+      <h1 id="page-heading" class="screen-title" title="{{ title }}">{{ title }}</h1>
+    </div>
+  {% endif %}
+  {% if toolbar %}
+    <div id="toolbar" class="flex">
+      {{ toolbar|raw }}
+    </div>
+  {% endif %}
+  {% if actionButton or additionalButtons or actionMenu or details %}
+    <div id="action-buttons" class="flex">
+      {{ additionalButtons|raw }}
+      {{ actionButton|raw }}
+      {{ actionMenu|raw }}
+    </div>
+  {% endif %}
+{% endblock %}
+
+{% block sidebar %}
+  {% set showOrganizers = craft.app.editionHandle != 'solo' and settings.organizerFilterEnabled and sources|find(source => source.canViewPeers(currentUser)) is not empty %}
+  {% if sources|length > 1 or showOrganizers %}
+    <nav>
+        <form id="calendar-form" class="calendar-filters">
+            {{
+                forms.checkboxSelectField({
+                    name: 'sources',
+                    class: 'calendar-filter colored',
+                    options: sources|map((source, key) => {
+                        label: source.pluralDisplayname,
+                        value: key,
+                        data: {
+                            color: source.color
+                        }
+                    })
+                })
+            }}
+
+            {% if showOrganizers %}
+              <div class="heading">
+                <span>{{ settings.organizerFilterLabel }}</span>
+              </div>
+
+              {% set organizers = craft.users.group(settings.organizerFilterGroup).orderBy('fullName').all() %}
+              {{ forms.checkboxSelectField({
+                name: 'organizers',
+                class: 'calendar-filter',
+                options: organizers|map(user => {
+                  label: user.fullName ?? user.email,
+                  value: user.id
+                }),
+              }) }}
+            {% endif %}
+        </form>
+    </nav>
+  {% endif %}
+{% endblock %}
+
+{% block toolbar %}
+    <div class="flex">
+        <button id="calendar-today-btn" type="button" class="btn">Today</button>
+        <div class="btngroup">
+            <button
+                id="calendar-prev-btn"
+                type="button"
+                class="btn"
+                data-icon="arrow-left"
+                title="Previous month"
+            >
+
+            </button>
+            <button
+                id="calendar-next-btn"
+                type="button"
+                class="btn"
+                data-icon="arrow-right"
+                title="Next month"
+            >
+
+            </button>
+        </div>&nbsp;<h1 class="calendar-title" id="calendar-title"></h1>
+    </div>
+
+    <button
+        id="calendar-view-btn"
+        type="button"
+        class="btn menubtn"
+        aria-controls="view-menu"
+        data-disclosure-trigger
+    >
+        {{ initialView|capitalize }}
+    </button>
+    <div id="view-menu" class="menu menu--disclosure" data-disclosure-menu>
+        <ul>
+            <li>
+                <button
+                    type="button"
+                    class="menu-item"
+                    data-calendar-view="day"
+                >
+                    Day
+                </button>
+                <button
+                    type="button"
+                    class="menu-item"
+                    data-calendar-view="week"
+                >
+                    Week
+                </button>
+                <button
+                    type="button"
+                    class="menu-item"
+                    data-calendar-view="month"
+                >
+                    Month
+                </button>
+                <button
+                    type="button"
+                    class="menu-item"
+                    data-calendar-view="year"
+                >
+                    Year
+                </button>
+                <button
+                    type="button"
+                    class="menu-item"
+                    data-calendar-view="schedule"
+                >
+                    Schedule
+                </button>
+            </li>
+        </ul>
+    </div>
+{% endblock %}
+
+{% block actionButton %}
+    <div class="buttons">
+        {% if (creatableSources|length) == 1 %}
+            {% set source = creatableSources|first %}
+            <a class="btn submit add icon" href="{{ source.cpUrl }}">
+                New {{ source.displayName }}
+            </a>
+        {% elseif (creatableSources|length) > 1 %}
+            <div class="btngroup">
+                <button
+                    type="button"
+                    class="btn submit menubtn add icon"
+                    aria-controls="new-event-menu"
+                    data-disclosure-trigger
+                >
+                    New event
+                </button>
+                <div
+                    id="new-event-menu"
+                    class="menu menu--disclosure"
+                    data-disclosure-menu
+                >
+                    <ul>
+                        <li>
+                            {% for source in creatableSources %}
+                                <a href="{{ source.cpUrl }}" tabindex="0">
+                                    New {{ source.displayName }}
+                                </a>
+                            {% endfor %}
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
+
+        {% if currentUser.admin and icsUrl %}
+            <button
+                type="button"
+                id="action-btn"
+                class="btn menubtn action-btn hairline-dark m"
+                title="Actions"
+                aria-controls="action-menu"
+                data-disclosure-trigger
+            >
+
+            </button>
+
+            <div
+                id="action-menu"
+                class="menu menu--disclosure"
+                data-disclosure-menu
+            >
+                <ul>
+                    <li>
+                        <a
+                            id="calendar-subscribe-btn"
+                            class="menu-item"
+                            href="{{ cpUrl(icsUrl) }}"
+                        >
+                            iCal address
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="calendar-wrapper">
+        <div
+            id="calendar"
+            data-initial-view="{{ initialView }}"
+            data-initial-date="{{ initialDate }}"
+            data-locale="{{ currentUser.preferredLocale }}"
+            data-first-day="{{ currentUser.getPreference('weekStartDay') }}"
+            data-source-url="{{ actionUrl('eventful/default/events') }}"
+            data-extra-event-sources="{{ extraEventSources |json_encode }}"
+        ></div>
+    </div>
+
+    {% if creatableSources %}
+        <div
+            id="calendar-context-menu-trigger"
+            aria-controls="calendar-context-menu"
+        ></div>
+        <div id="calendar-context-menu" class="menu menu--disclosure">
+            <ul>
+                <li>
+                    {% for source in creatableSources %}
+                        <a href="{{ source.actionUrl }}" data-date-field-handle="{{ source.dateFieldHandle }}" tabindex="0">
+                            New {{ source.displayName }}
+                        </a>
+                    {% endfor %}
+                </li>
+            </ul>
+        </div>
+    {% endif %}
+{% endblock %}

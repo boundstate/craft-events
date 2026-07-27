@@ -1,0 +1,269 @@
+{% import '_includes/forms' as forms %}
+
+<div id="{{ id }}" class="event-date-input loading">
+    <div class="row flex">
+        {% if field.allDay %}
+            {{
+                forms.dateField({
+                    id: 'start'|namespaceInputId(id),
+                    name: 'start'|namespaceInputName(name),
+                    value: value.start,
+                })
+            }}
+        {% else %}
+            {{
+                forms.dateTimeField({
+                    id: 'start'|namespaceInputId(id),
+                    name: 'start'|namespaceInputName(name),
+                    value: value.start
+                })
+            }}
+            -
+            {{
+                forms.timeField({
+                    id: 'end'|namespaceInputId(id),
+                    name: 'end'|namespaceInputName(name),
+                    value: value.end
+                })
+            }}
+
+            {{
+                forms.selectizeField({
+                    id: 'timezone'|namespaceInputId(id),
+                    name: 'timezone'|namespaceInputName(name),
+                    class: 'timezone-field',
+                    options: [
+                        {
+                            label: '',
+                            value: null
+                        }
+                    ]|merge(craft.cp.getTimeZoneOptions(value.start)),
+                    value: value.timezone
+                })
+            }}
+        {% endif %}
+        &nbsp;
+        {{
+            forms.checkboxField({
+                name: 'repeat'|namespaceInputName(name),
+                label: 'Repeats',
+                toggle: 'repeat',
+                checked: value.repeat
+            })
+        }}
+    </div>
+
+    <div id="repeat" class="row {{ not value.repeat ? 'hidden' }}">
+        <div class="row flex">
+            <span class="row-icon">{{ iconSvg('repeat') }}</span>
+
+            <span class="input-prefix">Every</span>
+
+            {{
+                forms.textField({
+                    id: 'interval'|namespaceInputId(id),
+                    name: 'interval'|namespaceInputName(name),
+                    class: 'input-short',
+                    type: 'number',
+                    min: 1,
+                    value: value.interval
+                })
+            }}
+
+            {{
+                forms.selectField({
+                    id: 'freq'|namespaceInputId(id),
+                    name: 'freq'|namespaceInputName(name),
+                    value: value.freq,
+                    options: freqOptions|map(
+                        option => {
+                            label: option.label
+                                ~ (value.interval != 1 ? 's' : ''),
+                            value: option.value
+                        }
+                    ),
+                    toggle: true,
+                    targetPrefix: 'freq-'
+                })
+            }}
+
+            <div
+                id="freq-WEEKLY"
+                class="flex {{ value.freq != 'WEEKLY' ? 'hidden' }}"
+            >
+                on
+                {{
+                    forms.checkboxSelectField({
+                        id: 'weekdays'|namespaceInputId(id),
+                        class: 'weekdays',
+                        options: dayOptions,
+                        values: value.byDay
+                    })
+                }}
+            </div>
+
+            <div
+                id="freq-MONTHLY"
+                class="flex {{ value.freq != 'MONTHLY' ? 'hidden' }}"
+            >
+                {{
+                    forms.selectField({
+                        id: 'month-repeat'|namespaceInputId(id),
+                        fieldClass: 'hidden',
+                        options: [
+                            {
+                                label: 'Loading...',
+                                value: value.byDay[0] ?? value.byMonthDay[0]
+                                    ?? null
+                            }
+                        ]
+                    })
+                }}
+            </div>
+
+            {% if not value.inDates|length or not value.exDates|length %}
+                <button
+                    type="button"
+                    id="{{ id }}-action-btn"
+                    class="btn action-btn"
+                    title="Actions"
+                    aria-controls="{{ id }}-action-menu"
+                    data-disclosure-trigger
+                >
+
+                </button>
+
+                <div
+                    id="{{ id }}-action-menu"
+                    class="menu menu--disclosure"
+                    data-disclosure-menu
+                >
+                    <ul>
+                        {% for inputName in ['inDates', 'exDates'] %}
+                            {% set inputValue = value[inputName] %}
+                            {% if not inputValue|length %}
+                                <li>
+                                    <button
+                                        type="button"
+                                        class="menu-item"
+                                        data-target="{{ id }}-{{
+                                        inputName
+                                        }}-container"
+                                    >
+                                        <span
+                                            class="icon"
+                                            data-icon="{{
+                                            inputName == 'inDates'
+                                                ? 'plus'
+                                                : 'minus'
+                                            }}"
+                                        >
+
+                                        </span>
+                                        {{ inputName == 'inDates'
+                                            ? 'Add'
+                                            : 'Remove' }} specific date
+                                    </button>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        </div>
+
+        {% for inputName in ['inDates', 'exDates'] %}
+            {% set inputValue = value[inputName] %}
+            <div
+                id="{{ id }}-{{ inputName }}-container"
+                class="row flex {{ not inputValue|length ? 'hidden' }}"
+            >
+                <span class="row-icon">
+                    {{
+                        iconSvg(
+                            inputName == 'inDates'
+                                ? 'circle-plus'
+                                : 'circle-minus'
+                        )
+                    }}
+                </span>
+                {{ inputName == 'inDates' ? 'And' : 'Except' }}
+                {{ include('eventful/fields/EventDate/_date-list', {
+                    dates: inputValue,
+                    inputName: inputName ~ '[]',
+                    namespace: name
+                }) }}
+            </div>
+        {% endfor %}
+
+        <div class="row flex">
+            <span class="row-icon">{{ iconSvg('octagon') }}</span>
+
+            {% set options = [
+                {
+                    label: 'Ends on',
+                    value: 'until'
+                },
+                {
+                    label: 'Ends after',
+                    value: 'count'
+                }
+            ] %}
+
+            {% if field.allowNeverEnding %}
+                {% set options =
+                    [
+                        {
+                            label: 'Never ends',
+                            value: null
+                        }
+                    ]|merge(options)
+                %}
+            {% endif %}
+
+            {{
+                forms.select({
+                    name: 'ends'|namespaceInputName(name),
+                    options,
+                    toggle: true,
+                    targetPrefix: 'ends-',
+                    value: value.ends
+                })
+            }}
+
+            <div id="ends-until" class="{{ value.ends != 'until' ? 'hidden' }}">
+                {{
+                    forms.dateField({
+                        id: 'until'|namespaceInputId(id),
+                        name: 'until'|namespaceInputName(name),
+                        value: value.until,
+                    })
+                }}
+            </div>
+
+            <div id="ends-count" class="{{ value.ends != 'count' ? 'hidden' }}">
+                {{
+                    forms.textField({
+                        id: 'count'|namespaceInputId(id),
+                        name: 'count'|namespaceInputName(name),
+                        class: 'input-short',
+                        type: 'number',
+                        suffix: value.count ?? 3 == 1
+                            ? 'occurrence'
+                            : 'occurrences',
+                        value: value.count ?? 3,
+                        min: 1
+                    })
+                }}
+            </div>
+        </div>
+    </div>
+
+    {% for value in value.byDay %}
+        {{ hiddenInput('byDay[]'|namespaceInputName(name), value) }}
+    {% endfor %}
+
+    {% for value in value.byMonthDay %}
+        {{ hiddenInput('byMonthDay[]'|namespaceInputName(name), value) }}
+    {% endfor %}
+</div>

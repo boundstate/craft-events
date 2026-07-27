@@ -1,0 +1,19 @@
+{% import '_includes/forms' as forms %}
+
+{{
+    forms.checkboxField({
+        label: 'Allow never ending repeating',
+        name: 'allowNeverEnding',
+        value: 1,
+        checked: field.allowNeverEnding
+    })
+}}
+
+{{
+    forms.checkboxField({
+        label: 'All day',
+        name: 'allDay',
+        value: 1,
+        checked: field.allDay
+    })
+}}

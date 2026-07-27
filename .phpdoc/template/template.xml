@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<template>
+    <name>markdown</name>
+    <version>0.0.0</version>
+    <transformations>
+        <transformation
+                writer="twig"
+                query="indexes.classes"
+                source="class.md.twig"
+                artifact="{{FullyQualifiedStructuralElementName}}.md"
+        />
+        <transformation
+                writer="twig"
+                query="indexes.enums"
+                source="class.md.twig"
+                artifact="{{FullyQualifiedStructuralElementName}}.md"
+        />
+        <transformation
+                writer="twig"
+                query="indexes.traits"
+                source="trait.md.twig"
+                artifact="{{FullyQualifiedStructuralElementName}}.md"
+        />
+        <transformation
+                writer="twig"
+                query="indexes.interfaces"
+                source="interface.md.twig"
+                artifact="{{FullyQualifiedStructuralElementName}}.md"
+        />
+        <transformation
+                writer="twig"
+                query="indexes.functions"
+                source="function.md.twig"
+                artifact="{{FullyQualifiedStructuralElementName}}.md"
+        />
+    </transformations>
+</template>

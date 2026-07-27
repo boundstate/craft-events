@@ -1,0 +1,9 @@
+{%- from 'macros/type.twig' import nodeType -%}
+
+---
+title: {{ node.name }}
+---
+
+# {{ node.abstract ? 'Abstract ' }}{{ node.final ? 'Final ' }}{{ nodeType(node) | capitalize }} {{ node.name }}
+
+{{ include('partials/description.md.twig', { node }) }}

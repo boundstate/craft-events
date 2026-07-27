@@ -1,0 +1,26 @@
+{%- from 'macros/escape.twig' import escapeMd -%}
+{%- from 'macros/warning.twig' import deprecationWarning -%}
+
+{%- autoescape false -%}
+
+{{ node.summary ? escapeMd(node.summary) }}
+
+{{ node.deprecated ? deprecationWarning(node) }}
+
+{%- if node.description | trim -%}
+  {%- set description = node.description.bodyTemplate ?? node.description -%}
+  {%- for tag in node.description.tags -%}
+    {%- set key = '%' ~ loop.index ~ '$s' -%}
+    {%- set description = description | replace({ (key): _self.inlineLinkTag(tag) }) -%}
+  {%- endfor -%}
+
+  {{~ description }}
+{% endif %}
+
+{{ include('partials/tags.md.twig', { tags: constant.tags }) }}
+
+{%- endautoescape -%}
+
+{% macro inlineLinkTag(tag) %}
+  {{- '[`' ~ tag.link ~ '`](#' ~ tag.link|trim('()')|lower ~ ')' -}}
+{% endmacro %}

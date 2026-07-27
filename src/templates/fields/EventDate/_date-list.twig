@@ -1,0 +1,37 @@
+{% import '_includes/forms' as forms %}
+
+<ul class="chips chips-small inline-chips" data-input-name="{{ inputName }}">
+    {% for date in dates %}
+        <li>
+            <div class="chip small removable">
+                <div class="chip-content">
+                    <div class="label">
+                        {{ date|date('D') }} {{ date|date('short') }}
+                    </div>
+                    <div class="chip-actions">
+                        <button
+                            type="button"
+                            class="btn action-btn delete icon"
+                        >
+
+                        </button>
+                    </div>
+
+                    {{
+                        forms.hidden({
+                            name: inputName|namespaceInputName(namespace),
+                            value: date|date('Y-m-d')
+                        })
+                    }}
+                </div>
+            </div>
+        </li>
+    {% endfor %}
+    <li>
+        {{
+            forms.dateField({
+                class: 'add'
+            })
+        }}
+    </li>
+</ul>

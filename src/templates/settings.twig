@@ -1,0 +1,146 @@
+{% import '_includes/forms.twig' as forms %}
+
+{% set readOnly = not craft.app.config.general.allowAdminChanges %}
+
+{{ forms.textField({
+  first: true,
+  label: 'Title Format'|t('app'),
+  instructions: 'Displayed on calendar and used as ICS summary.',
+  name: 'eventTitleTemplate',
+  value: settings.eventTitleTemplate,
+  errors: settings.getErrors('eventTitleTemplate'),
+  class: 'code',
+  disabled: readOnly,
+}) }}
+
+{{ forms.textareaField({
+  label: 'Description Format'|t('app'),
+  instructions: 'Displayed on calendar and used as ICS description.',
+  name: 'eventDescriptionTemplate',
+  value: settings.eventDescriptionTemplate,
+  errors: settings.getErrors('eventDescriptionTemplate'),
+  rows: 6,
+  class: 'code',
+  disabled: readOnly,
+}) }}
+
+{{ forms.textField({
+  label: 'Location Format'|t('app'),
+  instructions: 'Displayed on calendar and used as ICS location.',
+  name: 'eventLocationTemplate',
+  value: settings.eventLocationTemplate,
+  errors: settings.getErrors('eventLocationTemplate'),
+  class: 'code',
+  disabled: readOnly,
+}) }}
+
+<hr/>
+
+{{ forms.lightswitchField({
+  first: true,
+  label: 'Display timezone'|t('app'),
+  instructions: 'Display timezones in the calendar and when using Twig filters',
+  tip: 'This can be overridden when using the Twig filters in your own templates',
+  name: 'displayTimezone',
+  on: settings.displayTimezone,
+  toggle: 'displayTimezone',
+  disabled: readOnly,
+}) }}
+
+<hr/>
+
+{{ forms.autosuggestField({
+  label: 'Calendar Secret'|t('app'),
+  instructions: 'Used in public iCal address (leave empty to disable).',
+  name: 'calendarSecret',
+  value: settings.calendarSecret,
+  errors: settings.getErrors('calendarSecret'),
+  suggestEnvVars: true,
+  disabled: readOnly,
+}) }}
+
+<hr/>
+
+{{ forms.editableTableField({
+  label: 'Extra event sources'|t('app'),
+  id: 'extraEventSources',
+  name: 'extraEventSources',
+  cols: {
+    url: {
+      type: 'url',
+      heading: 'URL'|t('app'),
+    },
+    format: {
+      type: 'select',
+      heading: 'Format'|t('app'),
+      options: [
+        { label: 'JSON', value: 'json' },
+        { label: 'iCalendar', value: 'ics' },
+      ],
+      thin: true,
+    },
+    color: {
+      type: 'color',
+      heading: 'Color'|t('app'),
+      width: 110,
+    }
+  },
+  allowAdd: true,
+  allowReorder: true,
+  allowDelete: true,
+  rows: settings.extraEventSources,
+  errors: settings.getErrors('extraEventSources'),
+  data: {'error-key': 'extraEventSources'},
+  static: readOnly,
+}) }}
+
+{% if craft.app.editionHandle != 'solo' %}
+
+  <hr/>
+
+  <h2>{{ 'Calendar Filters'|t('app') }}</h2>
+
+  {{ forms.lightswitchField({
+    first: true,
+    label: 'Organizer'|t('app'),
+    name: 'organizerFilterEnabled',
+    on: settings.organizerFilterEnabled,
+    toggle: 'organizerFilterSettings',
+    disabled: readOnly,
+  }) }}
+
+  <div id="organizerFilterSettings" class="nested-fields{% if not settings.organizerFilterEnabled %} hidden{% endif %}">
+
+    {{ forms.textField({
+      label: 'Organizer Filter Label'|t('app'),
+      name: 'organizerFilterLabel',
+      value: settings.organizerFilterLabel,
+      errors: settings.getErrors('organizerFilterLabel'),
+      disabled: readOnly,
+    }) }}
+
+    {% set groups = [{ label: "None"|t('app'), value: '' }] %}
+    {% for group in craft.app.userGroups.getAllGroups() %}
+      {% set groups = groups|merge([{ label: group.name, value: group.handle }]) %}
+    {% endfor %}
+    {{ forms.textField({
+      label: 'Organizer Field Handle'|t('app'),
+      name: 'organizerFieldHandle',
+      value: settings.organizerFieldHandle,
+      errors: settings.getErrors('organizerFieldHandle'),
+      class: 'code',
+      disabled: readOnly,
+    }) }}
+
+    {{ forms.selectField({
+      label: 'Organizer User Group'|t('app'),
+      name: 'organizerFilterGroup',
+      options: groups,
+      value: settings.organizerFilterGroup,
+      errors: settings.getErrors('organizerFilterGroup'),
+      disabled: readOnly,
+    }) }}
+
+  </div>
+
+{% endif %}

@@ -1,0 +1,9 @@
+{% macro table(rows) %}
+  {%~ for col in rows|first %}|{% endfor %}|
+  {%~ for col in rows|first %}|-{% endfor %}|
+  {%~ for row in rows -%}
+    {%- for value in row -%}
+      {{- ('|' ~ value|replace({'|':'\\|'})|trim) | raw }}
+    {%- endfor %}|
+  {%~ endfor %}
+{% endmacro %}

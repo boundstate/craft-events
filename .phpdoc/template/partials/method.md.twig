@@ -1,0 +1,49 @@
+{%- from 'macros/table.twig' import table -%}
+{%- from 'macros/type.twig' import formatType -%}
+
+{%- autoescape false -%}
+
+### {{ method.name }}
+
+{{ include('partials/description.md.twig', { node: method }) }}
+
+{# Method signature #}
+```php
+{{ method.final ? 'final ' }}{{ method.visibility }} {{ method.static ? 'static ' }}{{ method.name }}(
+{%- for argument in method.arguments %}
+  {{- formatType(argument.type) }}
+  {{- argument.byReference ? '&' }} $
+  {{- argument.name }}{{ argument.default ? ' = ' ~ argument.default }}
+{%- if not loop.last %}, {% endif %}
+{%- endfor %})
+{{- method.response.type ? ': ' ~ formatType(method.response.type) }}
+```
+
+{# arguments #}
+{%- set rows = method.arguments|map(argument => [
+    '`$' ~ argument.name ~ '`',
+    argument.type ? formatType(argument.type, { md: true, relativeTo: node }),
+    argument.description,
+]) -%}
+
+{# return #}
+{%- if (method.response.type and method.response.type != 'void') or method.response.description is not empty -%}
+  {%- set rows = rows|merge([[
+      '**return**',
+      method.response.type ? formatType(method.response.type, { md: true, relativeTo: node }) : '',
+      include('partials/description.md.twig', { node: method.response })
+  ]]) -%}
+{%- endif -%}
+
+{# throws #}
+{%- if method.tags.throws is not empty -%}
+  {%- set rows = rows|merge(method.tags.throws|map(exception => [
+      '**throws**',
+      exception.type ? formatType(exception.type, { md: true, relativeTo: node }),
+      exception.description
+  ])) -%}
+{%- endif -%}
+
+{{ rows ? table(rows) }}
+
+{% endautoescape %}

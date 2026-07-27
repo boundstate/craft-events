@@ -1,0 +1,4 @@
+#!/bin/bash
+# Description: Run Zensical commands inside the virtual environment
+# Usage: ddev zensical new .  OR  ddev zensical build
+.venv/bin/zensical "$@"

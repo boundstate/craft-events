@@ -1,0 +1,5 @@
+<ul>
+  {% for occurrence in entry.date.occurrences %}
+    <li>{{ occurrence|eventDate }}</li>
+  {% endfor %}
+</ul>

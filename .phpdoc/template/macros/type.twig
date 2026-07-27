@@ -1,0 +1,121 @@
+{% macro formatType(type, options = { md: false }) %}
+  {%- autoescape false -%}
+
+  {%- set type = type|trim -%}
+  {%- set depth = options.depth ?? 0 -%}
+  {%- set md = options.md ?? false -%}
+  {%- set preview = options.preview ?? false -%}
+
+  {%- set options = {...options, depth: depth + 1} %}
+
+  {{- md and depth == 0 ? '<span class="code">' -}}
+
+  {%- if type starts with '?' -%}
+    {# Nullable types: ?Type #}
+    {{- '?' -}}{{- _self.formatType(type|slice(1), options) -}}
+
+  {%- elseif type ends with '[]' -%}
+    {# Array syntax: Type[] #}
+    {{- _self.formatType(type|slice(0,-2), options) -}}{{- '[]' -}}
+
+  {%- elseif type ends with '>' and '<' in type -%}
+    {# Generic/Wrapper syntax: class-string<Type>, array<Key, Value>, etc. #}
+    {%- set prefix = type|split('<')|first -%}
+    {%- set inner = type|slice(prefix|length + 1, -1) -%}
+    {{- prefix ~ (md ? '&lt;' : '<') ~ inner|split(',')|map(type => _self.formatType(type, options))|join(',') ~ (md ? '&gt;' : '>') -}}
+
+  {%- elseif '|' in type -%}
+    {# Union types: TypeA|TypeB #}
+    {{- type|split('|')|map(type => _self.formatType(type, options))|join('|') -}}
+
+  {%- elseif '&' in type -%}
+    {# Intersection types: TypeA&TypeB #}
+    {{- type|split('&')|map(type => _self.formatType(type, options))|join('&') -}}
+
+  {%- else -%}
+    {# Base case: Isolated FQCN or scalar #}
+    {%- if md -%}
+      {%- set url = _self._resolveTypeUrl(type, relativeTo: options.relativeTo) -%}
+      {%- if url -%}
+        {{- '[' ~ type|shortFQSEN ~ '](' ~ url ~ ' "' ~ type ~ '")' ~ (preview ? '{ data-preview }') -}}
+      {%- else -%}
+        {{- type|shortFQSEN -}}
+      {%- endif -%}
+    {%- else -%}
+      {{- type|shortFQSEN -}}
+    {%- endif -%}
+  {%- endif -%}
+
+  {{- md and depth == 0 ? '</span>' -}}
+
+  {%- endautoescape -%}
+{% endmacro %}
+
+
+{% macro nodeType(node) %}
+  {%- set nodeClass = constant('class', node) -%}
+  {%- if 'ClassDescriptor' in nodeClass -%}
+    class
+  {%- elseif 'FunctionDescriptor' in nodeClass -%}
+    function
+  {%- elseif 'InterfaceDescriptor' in nodeClass -%}
+    interface
+  {%- elseif 'MethodDescriptor' in nodeClass -%}
+    method
+  {%- elseif 'PropertyDescriptor' in nodeClass -%}
+    property
+  {%- elseif 'ConstantDescriptor' in nodeClass -%}
+    constant
+  {%- elseif 'TraitDescriptor' in nodeClass -%}
+    trait
+  {%- elseif 'EnumDescriptor' in nodeClass -%}
+    enum
+  {%- endif -%}
+{% endmacro %}
+
+{% macro _resolveTypeUrl(type, relativeTo = null) %}
+  {%- if type starts with '\\craft\\' -%}
+    {{- 'https://docs.craftcms.com/api/v5/' ~ type|slice(1)|replace({'\\': '-'})|lower ~ '.html' -}}
+  {%- elseif type starts with '\\yii\\' -%}
+    {{- 'https://www.yiiframework.com/doc/api/2.0/' ~ type|slice(1)|replace({'\\': '-'})|lower -}}
+  {%- elseif type starts with '\\Recurr\\' -%}
+    {{- 'https://github.com/simshaun/recurr/blob/v5.0.3/src/' ~ type|slice(1)|replace({'\\': '/'}) ~ '.php' -}}
+  {%- elseif type starts with '\\Sabre\\' %}
+    {{- 'https://github.com/sabre-io/vobject/tree/4.6.1/lib/' ~ type|split('\\')|slice(3)|join('/') ~ '.php' -}}
+  {%- elseif relativeTo -%}
+    {{- _self.relativeUrl(from: relativeTo.FullyQualifiedStructuralElementName, to: type) -}}
+  {%- endif -%}
+{% endmacro %}
+
+{% macro relativeUrl(from, to) %}
+  {%- set fromFolders = from|split('\\')|slice(1, -1) -%}
+  {%- set toParts =  to|split('\\')|slice(1) -%}
+
+  {#- identify the common base -#}
+  {% set commonCount = 0 %}
+  {%- set matching = true -%}
+  {%- for part in fromFolders -%}
+    {%- if matching and part == toParts[loop.index0] -%}
+      {% set commonCount = loop.index %}
+    {%- else -%}
+      {%- set matching = false -%}
+    {%- endif -%}
+  {%- endfor -%}
+
+  {% if commonCount > 0 %}
+    {%- set relativePath = [] -%}
+
+    {#- build upward traversal (../) -#}
+    {%- set upCount = fromFolders|length - commonCount -%}
+    {%- if upCount > 0 -%}
+      {%- for i in 1..upCount -%}
+        {%- set relativePath = [...relativePath, '..'] -%}
+      {%- endfor -%}
+    {%- endif -%}
+
+    {#- append remaining parts -#}
+    {%- set relativePath = [...relativePath, ...toParts|slice(commonCount)] -%}
+
+    {{- relativePath|join('/') ~ '.md' -}}
+  {%- endif -%}
+{% endmacro %}

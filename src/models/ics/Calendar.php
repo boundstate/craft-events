@@ -1,0 +1,151 @@
+<?php
+
+namespace boundstate\eventful\models\ics;
+
+use Craft;
+use craft\base\Model;
+use DateTime;
+use DateTimeZone;
+use Sabre\VObject\Component\VCalendar;
+use Sabre\VObject\Component\VTimeZone;
+
+class Calendar extends Model
+{
+    /**
+     * Post notification of an event.
+     * Used primarily as a method of advertising the existence of an event.
+     */
+    const METHOD_PUBLISH = 'PUBLISH';
+
+    /**
+     * Make a request for an event.
+     * This is an explicit invitation to one or more "Attendees".
+     * Event Requests are also used to update or change an existing event.
+     * Clients that cannot handle REQUEST may degrade the event to view it as a PUBLISH.
+     */
+    const METHOD_REQUEST = 'REQUEST';
+
+    /**
+     * Cancel one or more instances of an existing event.
+     */
+    const METHOD_CANCEL = 'CANCEL';
+
+    private readonly VCalendar $_doc;
+
+    /**
+     * @var Event[]
+     */
+    private array $_events = [];
+
+    public function __construct(array $config = [])
+    {
+        $this->_doc = new VCalendar([
+            'PRODID' => sprintf(
+                '-//%s/Calendar//EN',
+                Craft::$app->sites->currentSite->name,
+            ),
+        ]);
+        parent::__construct($config);
+    }
+
+    public function setMethod(string $method): static
+    {
+        $this->_doc->METHOD = $method;
+
+        return $this;
+    }
+
+    public function addEvent(array $config = []): Event
+    {
+        $event = new Event($this->_doc, $config);
+        $this->_events[] = $event;
+
+        return $event;
+    }
+
+    public function serialize(): string
+    {
+        return $this->_doc->serialize();
+    }
+
+    /**
+     * Adds a timezone definition the calendar.
+     */
+    public function addTimezones(): void
+    {
+        $timezones = array_unique(
+            array_map(
+                fn (Event $event) => $event
+                    ->getStart()
+                    ?->getTimezone()
+                    ->getName(),
+                $this->_events,
+            ),
+        );
+
+        foreach ($timezones as $tz) {
+            if ($tz) {
+                $this->addTimezone(new DateTimeZone($tz));
+            }
+        }
+    }
+
+    private function addTimezone(DateTimeZone $tz): void
+    {
+        /** @var VTimeZone $tzComponent */
+        $tzComponent = $this->_doc->add('VTIMEZONE', [
+            'TZID' => $tz->getName(),
+            'X-LIC-LOCATION' => $tz->getName(),
+        ]);
+
+        // generate the timezone transitions for a single year
+        // (we don't have any events starting before 2020)
+        $fromTimestamp = (new DateTime('2020-01-01'))->getTimestamp();
+        $toTimestamp = (new DateTime('2021-01-01'))->getTimestamp();
+        $transitions = $tz->getTransitions($fromTimestamp, $toTimestamp);
+
+        $tzFrom = $transitions[0]['offset'] / 3600;
+
+        foreach ($transitions as $i => $transition) {
+            if ($i === 0 && count($transitions) > 1) {
+                continue;
+            }
+
+            $date = new DateTime($transition['time']);
+            $offset = $transition['offset'] / 3600;
+
+            $component = $this->_doc->createComponent(
+                $transition['isdst'] ? 'DAYLIGHT' : 'STANDARD',
+                [
+                    'TZOFFSETFROM' => $this->formatTzOffset($tzFrom),
+                    'TZOFFSETTO' => $this->formatTzOffset($offset),
+                    'TZNAME' => $transition['abbr'],
+                    'DTSTART' => $date->format('Ymd\THis'),
+                ],
+            );
+
+            if (count($transitions) > 1) {
+                // assume that DST is observed from the 2nd Sunday in March to the 1st Sunday in November,
+                // to avoid including every timezone transition for the duration of our events
+                // (especially in case an event repeats forever)
+                $component->RRULE = $transition['isdst']
+                    ? 'FREQ=YEARLY;BYMONTH=3;BYDAY=2SU'
+                    : 'FREQ=YEARLY;BYMONTH=11;BYDAY=1SU';
+            }
+
+            $tzComponent->add($component);
+
+            $tzFrom = $offset;
+        }
+    }
+
+    private function formatTzOffset(int $offset): string
+    {
+        return sprintf(
+            '%s%02d%02d',
+            $offset >= 0 ? '+' : '-',
+            abs(floor($offset)),
+            ($offset - floor($offset)) * 60,
+        );
+    }
+}

@@ -1,0 +1,24 @@
+{%- from 'macros/type.twig' import formatType -%}
+
+{%- autoescape false -%}
+
+{%- set sees = tags.see ?? [] | filter(see => see.reference | trim) -%}
+{%- set links = tags.link ?? [] | filter(link => link.link | trim) -%}
+
+{%- if sees is not empty or links is not empty -%}
+  See {{ sees|map(see => _self.seeTag(see))|merge(links|map(link => _self.linkTag(link)))|join(', ') }}
+{% endif %}
+
+{%- endautoescape -%}
+
+{% macro seeTag(tag) %}
+  {{- formatType(tag.reference, { md: true, preview: true, relativeTo: node }) }}{{ tag.description | trim ? ' (' ~ tag.description ~ ')' -}}
+{% endmacro %}
+
+{% macro linkTag(tag) %}
+  {% if tag.description | trim and tag.description != tag.link -%}
+    {{- '[' ~ tag.description | trim ~ '](' ~ tag.link ~ ')' -}}
+  {%- else -%}
+    {{- tag.link -}}
+  {%- endif -%}
+{% endmacro %}

@@ -1,0 +1,12 @@
+{% macro deprecationWarning(node) %}
+  {{~ '<!-- prettier-ignore -->' }}
+  {{~ '!!! warning "Deprecated"' }}
+
+  {%- set multiple = node.deprecations|length > 1 -%}
+
+  {%- for deprecation in node.deprecations %}
+
+    {{~ '    ' ~ (multiple ? '- ') ~ deprecation.description|trim }}
+  {%- endfor -%}
+
+{% endmacro %}

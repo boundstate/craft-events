@@ -1,0 +1,13 @@
+{%- from 'macros/type.twig' import formatType -%}
+
+{%- autoescape false -%}
+
+### {{ property.name }}
+
+{{ include('partials/description.md.twig', { node: property }) }}
+
+```php
+{{ property.visibility }} {{ property.static ? 'static ' }}{{ property.type ? formatType(property.type) ~ ' ' }}${{ property.name }}
+```
+
+{% endautoescape %}

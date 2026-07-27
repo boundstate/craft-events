@@ -1,0 +1,71 @@
+dateModified: 1785435731
+elementSources:
+  craft\elements\Entry:
+    - key: '*'
+      page: Entries
+      type: native
+    - heading: Channels
+      key: 'heading:903a8214-1e6a-4973-955e-13eb66c96336'
+      page: Entries
+      type: heading
+    - defaultSort:
+        - 'field:b696196d-1035-401a-a42f-f809dab2071b' # Date
+        - desc
+      defaultViewMode: ''
+      disabled: false
+      key: 'section:299b0f22-f196-473d-b9ff-b8e0b8890612' # Meetings
+      page: Entries
+      tableAttributes:
+        - status
+        - 'field:b696196d-1035-401a-a42f-f809dab2071b' # Date
+      type: native
+    - defaultSort:
+        - 'field:b696196d-1035-401a-a42f-f809dab2071b' # Date
+        - desc
+      defaultViewMode: ''
+      disabled: false
+      key: 'section:d155de91-9a72-4b8e-97c5-85bbe06fba73' # Virtual Training
+      page: Entries
+      tableAttributes:
+        - status
+        - 'field:b696196d-1035-401a-a42f-f809dab2071b' # Date
+        - link
+      type: native
+email:
+  fromEmail: demo@example.com
+  fromName: 'Eventful Demo'
+  transportType: craft\mail\transportadapters\Sendmail
+meta:
+  __names__:
+    0dfacb2b-5309-4839-bd34-9d467daf1614: 'Public Schema' # Public Schema
+    5db173fa-6784-482f-a62e-4417081cd07f: 'Eventful Demo' # Eventful Demo
+    65e75b6f-8a8e-42e4-8e0a-56b3e1def767: Meeting # Meeting
+    299b0f22-f196-473d-b9ff-b8e0b8890612: Meetings # Meetings
+    b696196d-1035-401a-a42f-f809dab2071b: Date # Date
+    d2b3b644-c827-4198-a57b-a5bbb8018f60: 'Eventful Demo' # Eventful Demo
+    d155de91-9a72-4b8e-97c5-85bbe06fba73: 'Virtual Training' # Virtual Training
+    fe7a3f95-bbc2-48ed-8e8e-9b1577c9817d: 'Virtual Training' # Virtual Training
+plugins:
+  eventful:
+    edition: standard
+    enabled: true
+    schemaVersion: 1.0.0
+    settings:
+      calendarSecret: null
+      displayTimezone: false
+      eventDescriptionTemplate: '{description}'
+      eventLocationTemplate: '{{ object.location.one()|address({ html: not ics }) }}'
+      eventTitleTemplate: '{title}'
+system:
+  edition: solo
+  live: true
+  name: 'Eventful Demo'
+  schemaVersion: 5.10.0.0
+  timeZone: America/Los_Angeles
+users:
+  allowPublicRegistration: false
+  defaultGroup: null
+  photoSubpath: null
+  photoVolumeUid: null
+  require2fa: false
+  requireEmailVerification: true

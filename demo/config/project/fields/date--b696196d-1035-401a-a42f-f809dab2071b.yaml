@@ -1,0 +1,11 @@
+columnSuffix: null
+handle: date
+instructions: null
+name: Date
+searchable: false
+settings:
+  allDay: false
+  allowNeverEnding: false
+translationKeyFormat: null
+translationMethod: none
+type: boundstate\eventful\fields\EventDate

@@ -1,0 +1,20 @@
+defaultPlacement: end
+enableVersioning: true
+entryTypes:
+  - uid: fe7a3f95-bbc2-48ed-8e8e-9b1577c9817d # Virtual Training
+handle: virtualTraining
+maxAuthors: 1
+minAuthors: 1
+name: 'Virtual Training'
+previewTargets:
+  - label: 'Primary entry page'
+    refresh: '1'
+    urlFormat: '{url}'
+propagationMethod: all
+siteSettings:
+  5db173fa-6784-482f-a62e-4417081cd07f: # Eventful Demo
+    enabledByDefault: true
+    hasUrls: true
+    template: virtual-training/_entry.twig
+    uriFormat: 'virtual-training/{slug}'
+type: channel

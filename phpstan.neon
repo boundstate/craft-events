@@ -1,0 +1,14 @@
+includes:
+  - vendor/craftcms/phpstan/phpstan.neon
+
+parameters:
+  level: 6
+  paths:
+    - src
+  ignoreErrors:
+    -
+      identifier: missingType.iterableValue
+    -
+      identifier: property.notFound
+  stubFiles:
+    - stubs/Recurrence.stub

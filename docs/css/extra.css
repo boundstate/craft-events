@@ -1,0 +1,20 @@
+thead {
+  display: none;
+}
+
+tbody tr:first-child td {
+  border: none !important;
+}
+
+tbody tr td:first-child {
+  white-space: nowrap;
+}
+
+.code {
+  font-feature-settings: 'kern';
+  font-family: var(--md-code-font-family);
+}
+
+.block {
+  display: block;
+}

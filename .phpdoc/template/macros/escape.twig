@@ -1,0 +1,7 @@
+{#
+# Escape markdown special characters
+# @param $text string The text to escape
+#}
+{% macro escapeMd(text) -%}
+  {{- text | replace({'|':'\\|'}) | raw -}}
+{%- endmacro %}

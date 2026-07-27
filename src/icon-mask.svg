@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-304 -304 16 14.48">
+    <defs>
+        <mask id="mask" fill="none">
+            <rect x="-304" y="-304" width="100%" height="100%" style="fill: #fff" />
+            <text data-eventful-icon-date="" style="fill: #000" x="-296.16" y="-293.058" font-family="'Ubuntu Sans', 'Open Sans', Roboto, 'Segoe UI', sans-serif" font-size="10.667" font-weight="800" text-anchor="middle"></text>
+        </mask>
+    </defs>
+    <path mask="url(#mask)" fill="#000" d="M-296-304c-3.404 0-5.297 0-6.533 1s-1.235 3.802-1.235 6.557h15.537c0-2.755 0-5.557-1.236-6.557s-3.129-1-6.533-1m-7.768 7.957c-.31 2.712-.493 4.315.717 5.402 1.247 1.12 3.321 1.121 7.053 1.121s5.805 0 7.053-1.12c1.21-1.088 1.027-2.691.716-5.403z"/>
+</svg>

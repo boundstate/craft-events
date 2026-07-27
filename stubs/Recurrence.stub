@@ -1,0 +1,11 @@
+<?php
+
+namespace Recurr;
+
+class Recurrence
+{
+    /**
+     * @return ?\DateTime
+     */
+    public function getEnd();
+}

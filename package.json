@@ -1,0 +1,30 @@
+{
+  "name": "@boundstate/eventful",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "start": "vite",
+    "build": "vite build",
+    "prepare": "husky",
+    "typecheck": "tsc --noEmit"
+  },
+  "lint-staged": {
+    "*.php": "./vendor/bin/pint",
+    "*.{css,js,json,md,mjs,scss,ts,yaml,yml}": "prettier --write"
+  },
+  "dependencies": {
+    "@fullcalendar/core": "^6.1.21",
+    "@fullcalendar/daygrid": "^6.1.21",
+    "@fullcalendar/icalendar": "^6.1.21",
+    "@fullcalendar/interaction": "^6.1.21",
+    "@fullcalendar/list": "^6.1.21",
+    "@fullcalendar/multimonth": "^6.1.21",
+    "@fullcalendar/timegrid": "^6.1.21"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7",
+    "lint-staged": "^17.2.0",
+    "prettier": "^3.9.6",
+    "vite": "^8.1.5"
+  }
+}
