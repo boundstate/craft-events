@@ -63,16 +63,16 @@ public findSourceByKey(string $key): EventSource
 ### getEvents
 
 ```php
-public getEvents(mixed $date = null, ?array $extraCriteria = null, string[]|null $sourceKeys = null, User|null $user = null): array<string,ElementInterface[]>
+public getEvents(mixed $date = null, ?array $extraQueryParams = null, string[]|null $sourceKeys = null, User|null $user = null): array<string,ElementInterface[]>
 ```
 
-|                  |                                                                                                                                                                         |                                        |
-| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
-| `$date`          | <span class="code">mixed</span>                                                                                                                                         |                                        |
-| `$extraCriteria` | <span class="code">?array</span>                                                                                                                                        |                                        |
-| `$sourceKeys`    | <span class="code">string[]\|null</span>                                                                                                                                |                                        |
-| `$user`          | <span class="code">[User](https://docs.craftcms.com/api/v5/craft-elements-user.html '\\craft\\elements\\User')\|null</span>                                             | only return events the user can access |
-| **return**       | <span class="code">array&lt;string,[ElementInterface](https://docs.craftcms.com/api/v5/craft-base-elementinterface.html '\\craft\\base\\ElementInterface')[]&gt;</span> |                                        |
+|                     |                                                                                                                                                                         |                                        |
+| ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `$date`             | <span class="code">mixed</span>                                                                                                                                         |                                        |
+| `$extraQueryParams` | <span class="code">?array</span>                                                                                                                                        |                                        |
+| `$sourceKeys`       | <span class="code">string[]\|null</span>                                                                                                                                |                                        |
+| `$user`             | <span class="code">[User](https://docs.craftcms.com/api/v5/craft-elements-user.html '\\craft\\elements\\User')\|null</span>                                             | only return events the user can access |
+| **return**          | <span class="code">array&lt;string,[ElementInterface](https://docs.craftcms.com/api/v5/craft-base-elementinterface.html '\\craft\\base\\ElementInterface')[]&gt;</span> |                                        |
 
 ### updateICalendarSequence
 

@@ -51,7 +51,7 @@ class EntryEventSource extends EventSource
         return $this->section->name;
     }
 
-    public function criteria(): array
+    public function queryParams(): array
     {
         return [
             'section' => $this->section->handle,

@@ -50,10 +50,10 @@ public displayName(): string
 | ---------- | -------------------------------- | --- |
 | **return** | <span class="code">string</span> |     |
 
-### criteria
+### queryParams
 
 ```php
-public criteria(): array
+public queryParams(): array
 ```
 
 |            |                                 |     |

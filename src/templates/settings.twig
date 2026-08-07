@@ -5,7 +5,7 @@
 {{ forms.textField({
   first: true,
   label: 'Title Format'|t('app'),
-  instructions: 'Displayed on calendar and used as ICS summary.',
+  instructions: 'Displayed on calendar and used as ICS file summary.',
   name: 'eventTitleTemplate',
   value: settings.eventTitleTemplate,
   errors: settings.getErrors('eventTitleTemplate'),
@@ -15,7 +15,7 @@
 
 {{ forms.textareaField({
   label: 'Description Format'|t('app'),
-  instructions: 'Displayed on calendar and used as ICS description.',
+  instructions: 'Displayed on calendar and used as ICS file description.',
   name: 'eventDescriptionTemplate',
   value: settings.eventDescriptionTemplate,
   errors: settings.getErrors('eventDescriptionTemplate'),
@@ -26,7 +26,7 @@
 
 {{ forms.textField({
   label: 'Location Format'|t('app'),
-  instructions: 'Displayed on calendar and used as ICS location.',
+  instructions: 'Displayed on calendar and used as ICS file location.',
   name: 'eventLocationTemplate',
   value: settings.eventLocationTemplate,
   errors: settings.getErrors('eventLocationTemplate'),
@@ -38,9 +38,8 @@
 
 {{ forms.lightswitchField({
   first: true,
-  label: 'Display timezone'|t('app'),
-  instructions: 'Display timezones in the calendar and when using Twig filters',
-  tip: 'This can be overridden when using the Twig filters in your own templates',
+  label: 'Display timezones'|t('app'),
+  instructions: 'Display event date timezones in the calendar, and by default when using Twig filters.',
   name: 'displayTimezone',
   on: settings.displayTimezone,
   toggle: 'displayTimezone',
@@ -49,9 +48,11 @@
 
 <hr/>
 
+<h2>{{ 'Calendar'|t('app') }}</h2>
+
 {{ forms.autosuggestField({
-  label: 'Calendar Secret'|t('app'),
-  instructions: 'Used in public iCal address (leave empty to disable).',
+  label: 'iCalendar Secret'|t('app'),
+  instructions: 'Secret used in public iCalendar URL (leave empty for no public URL).'|t('app'),
   name: 'calendarSecret',
   value: settings.calendarSecret,
   errors: settings.getErrors('calendarSecret'),
@@ -59,10 +60,10 @@
   disabled: readOnly,
 }) }}
 
-<hr/>
-
 {{ forms.editableTableField({
-  label: 'Extra event sources'|t('app'),
+  label: 'Extra Event Sources'|t('app'),
+  instructions: 'Display extra events from public [JSON](https://fullcalendar.io/docs/events-json-feed) and [iCalendar](https://fullcalendar.io/docs/icalendar) feeds.'|t('app'),
+  tip: 'To include the current year in a URL, use `{year}`',
   id: 'extraEventSources',
   name: 'extraEventSources',
   cols: {
@@ -86,6 +87,7 @@
     }
   },
   allowAdd: true,
+  addRowLabel: 'Add an event source'|t('app'),
   allowReorder: true,
   allowDelete: true,
   rows: settings.extraEventSources,
@@ -96,13 +98,9 @@
 
 {% if craft.app.editionHandle != 'solo' %}
 
-  <hr/>
-
-  <h2>{{ 'Calendar Filters'|t('app') }}</h2>
-
   {{ forms.lightswitchField({
-    first: true,
-    label: 'Organizer'|t('app'),
+    label: 'Organizer Filter'|t('app'),
+    instructions: 'Show organizer filter on calendar.',
     name: 'organizerFilterEnabled',
     on: settings.organizerFilterEnabled,
     toggle: 'organizerFilterSettings',
@@ -124,16 +122,18 @@
       {% set groups = groups|merge([{ label: group.name, value: group.handle }]) %}
     {% endfor %}
     {{ forms.textField({
-      label: 'Organizer Field Handle'|t('app'),
-      name: 'organizerFieldHandle',
-      value: settings.organizerFieldHandle,
-      errors: settings.getErrors('organizerFieldHandle'),
+      label: 'Organizer Query Parameter'|t('app'),
+      instructions: 'The [parameter](https://craftcms.com/docs/5.x/development/element-queries.html#types-parameters) to use when querying events by organizer ID.',
+      name: 'organizerQueryParam',
+      value: settings.organizerQueryParam,
+      errors: settings.getErrors('organizerQueryParam'),
       class: 'code',
       disabled: readOnly,
     }) }}
 
     {{ forms.selectField({
       label: 'Organizer User Group'|t('app'),
+      instructions: 'User group to query when displaying filter options.',
       name: 'organizerFilterGroup',
       options: groups,
       value: settings.organizerFilterGroup,

@@ -25,7 +25,7 @@ class Settings extends Model
 
     public ?string $organizerFilterGroup = null;
 
-    public string $organizerFieldHandle = 'authorId';
+    public string $organizerQueryParam = 'authorId';
 
     public function parseCalendarSecret(): ?string
     {
@@ -38,7 +38,7 @@ class Settings extends Model
             [['eventTitleTemplate', 'eventDescriptionTemplate', 'eventLocationTemplate'], 'string'],
             [['calendarSecret'], 'string'],
             [['displayTimezone', 'organizerFilterEnabled'], 'boolean'],
-            [['organizerFilterLabel', 'organizerFilterGroup', 'organizerFieldHandle'], 'string'],
+            [['organizerFilterLabel', 'organizerFilterGroup', 'organizerQueryParam'], 'string'],
         ];
     }
 }

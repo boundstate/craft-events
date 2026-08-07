@@ -35,7 +35,7 @@ abstract class EventSource extends Model
         return [];
     }
 
-    abstract public function criteria(): array;
+    abstract public function queryParams(): array;
 
     abstract public function displayName(): string;
 

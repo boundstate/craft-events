@@ -43,7 +43,7 @@ class ProductEventSource extends EventSource
         return $this->productType->name;
     }
 
-    public function criteria(): array
+    public function queryParams(): array
     {
         return [
             'type' => $this->productType->handle,

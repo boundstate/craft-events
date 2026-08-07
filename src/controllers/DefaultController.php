@@ -186,9 +186,9 @@ class DefaultController extends Controller
 
         $elementsBySource = Eventful::getInstance()->events->getEvents(
             date: ['inRange' => [$start, $end]],
-            extraCriteria: [
+            extraQueryParams: [
                 'status' => ['enabled', 'disabled'],
-                $settings->organizerFieldHandle => $organizers,
+                $settings->organizerQueryParam => $organizers,
                 'site' => $site,
             ],
             sourceKeys: $sourceKeys,

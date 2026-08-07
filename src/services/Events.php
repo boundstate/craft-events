@@ -109,7 +109,7 @@ class Events extends Component
      */
     public function getEvents(
         mixed $date = null,
-        ?array $extraCriteria = null,
+        ?array $extraQueryParams = null,
         ?array $sourceKeys = null,
         ?User $user = null,
     ): array {
@@ -123,21 +123,21 @@ class Events extends Component
                 /** @var ElementQuery<int, ElementInterface> $query */
                 $query = $source::elementType()::find();
 
-                $criteria = $source->criteria();
+                $queryParams = $source->queryParams();
 
                 if ($date !== null) {
-                    $criteria = [...$criteria, $source->dateFieldHandle => $date];
+                    $queryParams = [...$queryParams, $source->dateFieldHandle => $date];
                 }
 
-                if ($extraCriteria) {
-                    $criteria = [...$criteria, ...$extraCriteria];
+                if ($extraQueryParams) {
+                    $queryParams = [...$queryParams, ...$extraQueryParams];
                 }
 
                 if ($user && ! $source->canViewPeers($user)) {
-                    $criteria = [...$criteria, 'authorId' => $user->id];
+                    $queryParams = [...$queryParams, 'authorId' => $user->id];
                 }
 
-                Craft::configure($query, $criteria);
+                Craft::configure($query, $queryParams);
 
                 $elementsBySource[$key] = $query->all();
             }

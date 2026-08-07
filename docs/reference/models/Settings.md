@@ -62,10 +62,10 @@ public string $organizerFilterLabel
 public ?string $organizerFilterGroup
 ```
 
-### organizerFieldHandle
+### organizerQueryParam
 
 ```php
-public string $organizerFieldHandle
+public string $organizerQueryParam
 ```
 
 ## Methods

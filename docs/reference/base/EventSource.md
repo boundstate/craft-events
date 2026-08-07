@@ -46,10 +46,10 @@ public static sources(): array<string,array>
 | ---------- | --------------------------------------------------- | --------------------------------------------- |
 | **return** | <span class="code">array&lt;string,array&gt;</span> | keyed by source key, values are config arrays |
 
-### criteria
+### queryParams
 
 ```php
-public criteria(): array
+public queryParams(): array
 ```
 
 |            |                                 |     |
