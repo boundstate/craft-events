@@ -8,8 +8,8 @@ use boundstate\eventful\events\AfterBuildIcsEvent;
 use boundstate\eventful\helpers\EventRenderer;
 use boundstate\eventful\helpers\UrlHelper;
 use boundstate\eventful\models\EventDate;
-use boundstate\eventful\models\ics\Calendar;
-use boundstate\eventful\models\ics\Event;
+use boundstate\eventful\models\IcsCalendar;
+use boundstate\eventful\models\IcsEvent;
 use boundstate\eventful\records\Metadata;
 use Craft;
 use craft\base\ElementInterface;
@@ -39,7 +39,7 @@ class Exporter extends Component
             $elements = [$elements];
         }
 
-        $calendar = new Calendar;
+        $calendar = new IcsCalendar;
         foreach ($elements as $element) {
             $this->addEvent($calendar, $element);
         }
@@ -68,7 +68,7 @@ class Exporter extends Component
         $attendees = MailerHelper::normalizeEmails($attendees);
 
         return array_map(function ($element) use ($attendees, $method): string {
-            $calendar = new Calendar;
+            $calendar = new IcsCalendar;
             $calendar->setMethod($method);
             $this->addEvent($calendar, $element, $attendees, $method);
             $calendar->addTimezones();
@@ -83,7 +83,7 @@ class Exporter extends Component
      * @throws InvalidFieldException
      */
     private function addEvent(
-        Calendar $calendar,
+        IcsCalendar $calendar,
         ElementInterface $element,
         array $attendees = [],
         ?string $method = null,
@@ -109,8 +109,8 @@ class Exporter extends Component
             $event->setRule($date->rule);
         }
 
-        if ($method === Calendar::METHOD_CANCEL) {
-            $event->setStatus(Event::STATUS_CANCELLED);
+        if ($method === IcsCalendar::METHOD_CANCEL) {
+            $event->setStatus(IcsEvent::STATUS_CANCELLED);
         }
 
         $host = UrlHelper::hostname();

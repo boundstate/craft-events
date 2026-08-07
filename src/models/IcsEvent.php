@@ -1,6 +1,6 @@
 <?php
 
-namespace boundstate\eventful\models\ics;
+namespace boundstate\eventful\models;
 
 use boundstate\eventful\helpers\DateHelper;
 use boundstate\eventful\helpers\UrlHelper;
@@ -11,7 +11,7 @@ use Recurr\Rule;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Component\VEvent;
 
-class Event extends Model
+class IcsEvent extends Model
 {
     const STATUS_CANCELLED = 'CANCELLED';
 

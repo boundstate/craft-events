@@ -19,7 +19,7 @@ public ElementInterface $element
 ### icsEvent
 
 ```php
-public Event $icsEvent
+public IcsEvent $icsEvent
 ```
 
 ### attendees

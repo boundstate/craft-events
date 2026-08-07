@@ -8,7 +8,7 @@ use boundstate\eventful\helpers\EventDateHelper;
 use boundstate\eventful\helpers\EventRenderer;
 use boundstate\eventful\models\EventDate;
 use boundstate\eventful\models\EventSource;
-use boundstate\eventful\models\ics\Calendar;
+use boundstate\eventful\models\IcsCalendar;
 use boundstate\eventful\web\assets\CpCalendarAsset;
 use Craft;
 use craft\base\Element;
@@ -285,7 +285,7 @@ class DefaultController extends Controller
 
         $icsContents = Eventful::getInstance()->exporter->toMultipleIcs(
             $element,
-            method: Calendar::METHOD_PUBLISH,
+            method: IcsCalendar::METHOD_PUBLISH,
         );
 
         if (count($icsContents) === 1) {

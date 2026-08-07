@@ -1,6 +1,6 @@
 <?php
 
-namespace boundstate\eventful\models\ics;
+namespace boundstate\eventful\models;
 
 use Craft;
 use craft\base\Model;
@@ -9,7 +9,7 @@ use DateTimeZone;
 use Sabre\VObject\Component\VCalendar;
 use Sabre\VObject\Component\VTimeZone;
 
-class Calendar extends Model
+class IcsCalendar extends Model
 {
     /**
      * Post notification of an event.
@@ -33,7 +33,7 @@ class Calendar extends Model
     private readonly VCalendar $_doc;
 
     /**
-     * @var Event[]
+     * @var IcsEvent[]
      */
     private array $_events = [];
 
@@ -55,9 +55,9 @@ class Calendar extends Model
         return $this;
     }
 
-    public function addEvent(array $config = []): Event
+    public function addEvent(array $config = []): IcsEvent
     {
-        $event = new Event($this->_doc, $config);
+        $event = new IcsEvent($this->_doc, $config);
         $this->_events[] = $event;
 
         return $event;
@@ -75,7 +75,7 @@ class Calendar extends Model
     {
         $timezones = array_unique(
             array_map(
-                fn (Event $event) => $event
+                fn (IcsEvent $event) => $event
                     ->getStart()
                     ?->getTimezone()
                     ->getName(),

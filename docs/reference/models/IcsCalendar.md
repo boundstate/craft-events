@@ -1,8 +1,8 @@
 ---
-title: Calendar
+title: IcsCalendar
 ---
 
-# Class Calendar
+# Class IcsCalendar
 
 <small class="block">Extends <span class="code">[Model](https://docs.craftcms.com/api/v5/craft-base-model.html '\\craft\\base\\Model')</span></small>
 
@@ -53,13 +53,13 @@ public setMethod(string $method): static
 ### addEvent
 
 ```php
-public addEvent(array $config = []): Event
+public addEvent(array $config = []): IcsEvent
 ```
 
-|            |                                                                                          |     |
-| ---------- | ---------------------------------------------------------------------------------------- | --- |
-| `$config`  | <span class="code">array</span>                                                          |     |
-| **return** | <span class="code">[Event](Event.md '\\boundstate\\eventful\\models\\ics\\Event')</span> |     |
+|            |                                                                                              |     |
+| ---------- | -------------------------------------------------------------------------------------------- | --- |
+| `$config`  | <span class="code">array</span>                                                              |     |
+| **return** | <span class="code">[IcsEvent](IcsEvent.md '\\boundstate\\eventful\\models\\IcsEvent')</span> |     |
 
 ### serialize
 

@@ -1,8 +1,8 @@
 ---
-title: Event
+title: IcsEvent
 ---
 
-# Class Event
+# Class IcsEvent
 
 <small class="block">Extends <span class="code">[Model](https://docs.craftcms.com/api/v5/craft-base-model.html '\\craft\\base\\Model')</span></small>
 

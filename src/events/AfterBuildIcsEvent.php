@@ -2,7 +2,7 @@
 
 namespace boundstate\eventful\events;
 
-use boundstate\eventful\models\ics\Event as IcsEvent;
+use boundstate\eventful\models\IcsEvent;
 use craft\base\ElementInterface;
 use yii\base\Event;
 
