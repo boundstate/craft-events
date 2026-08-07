@@ -2,40 +2,35 @@
 
 namespace boundstate\eventful\models;
 
-use boundstate\eventful\base\EventSource;
-use boundstate\eventful\fields\EventDate as EventDateField;
+use boundstate\eventful\base\EventType;
+use boundstate\eventful\Eventful;
+use craft\commerce\elements\db\ProductQuery;
 use craft\commerce\elements\Product;
 use craft\commerce\models\ProductType;
 use craft\commerce\Plugin;
 use craft\elements\User;
-use craft\helpers\ArrayHelper;
 use craft\helpers\UrlHelper;
 
-class ProductEventSource extends EventSource
+class ProductEventType extends EventType
 {
     public ProductType $productType;
 
-    public static function elementType(): string
-    {
-        return Product::class;
-    }
-
-    public static function sources(): array
+    public static function discoverTypes(): array
     {
         $productTypes = Plugin::getInstance()->productTypes->getAllProductTypes();
 
-        $sources = [];
+        $types = [];
         foreach ($productTypes as $productType) {
-            $dateField = ArrayHelper::firstWhere($productType->getFieldLayout()->getCustomFields(), fn ($field) => $field instanceof EventDateField);
+            $dateField = Eventful::getInstance()->events->findDateField($productType);
             if ($dateField) {
-                $sources["productType:$productType->handle"] = [
+                $types["productType:$productType->handle"] = new ProductEventType([
                     'dateFieldHandle' => $dateField->handle,
                     'productType' => $productType,
-                ];
+                ]);
             }
         }
 
-        return $sources;
+        return $types;
     }
 
     public function displayName(): string
@@ -43,11 +38,10 @@ class ProductEventSource extends EventSource
         return $this->productType->name;
     }
 
-    public function queryParams(): array
+    // @phpstan-ignore missingType.generics
+    public function find(): ProductQuery
     {
-        return [
-            'type' => $this->productType->handle,
-        ];
+        return Product::find()->type($this->productType->handle);
     }
 
     public function getCpUrl(): string

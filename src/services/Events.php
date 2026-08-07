@@ -2,18 +2,18 @@
 
 namespace boundstate\eventful\services;
 
-use boundstate\eventful\base\EventSource;
+use boundstate\eventful\base\EventType;
 use boundstate\eventful\db\Table;
 use boundstate\eventful\enums\Color;
 use boundstate\eventful\events\RegisterEventSourcesEvent;
-use boundstate\eventful\events\RegisterEventSourceTypesEvent;
+use boundstate\eventful\events\RegisterEventTypesEvent;
 use boundstate\eventful\fields\EventDate as EventDateField;
-use boundstate\eventful\models\EntryEventSource;
-use boundstate\eventful\models\ProductEventSource;
+use boundstate\eventful\models\EntryEventType;
+use boundstate\eventful\models\EventSource;
+use boundstate\eventful\models\ProductEventType;
 use Craft;
 use craft\base\ElementInterface;
 use craft\base\FieldLayoutProviderInterface;
-use craft\elements\db\ElementQuery;
 use craft\elements\User;
 use craft\helpers\ArrayHelper;
 use craft\helpers\Db;
@@ -23,17 +23,28 @@ use yii\db\Expression;
 class Events extends Component
 {
     /**
-     * @see RegisterEventSourceTypesEvent
+     * @see RegisterEventTypesEvent
      */
-    const EVENT_REGISTER_SOURCE_TYPES = 'registerSourceTypes';
+    const EVENT_REGISTER_TYPES = 'registerTypes';
 
     /**
      * @see RegisterEventSourcesEvent
      */
     const EVENT_REGISTER_SOURCES = 'registerSources';
 
-    private ?array $_sourceTypes = null;
+    /**
+     * @var ?array<class-string<EventType>>
+     */
+    private ?array $_typeClasses = null;
 
+    /**
+     * @var ?array<string, EventType>
+     */
+    private ?array $_types = null;
+
+    /**
+     * @var ?array<string, EventSource>
+     */
     private ?array $_sources = null;
 
     public function findDateField(ElementInterface|FieldLayoutProviderInterface $type): ?EventDateField
@@ -46,24 +57,21 @@ class Events extends Component
         return ArrayHelper::firstWhere($fieldLayout->getCustomFields(), fn ($field) => $field instanceof EventDateField);
     }
 
-    /**
-     * @return array<class-string<EventSource>>
-     */
-    public function getSourceTypes(): array
+    public function getTypes(): array
     {
-        if (! $this->_sourceTypes) {
-            $this->_sourceTypes = [EntryEventSource::class];
+        if (! $this->_types) {
+            $typeInstances = [];
 
-            if (Craft::$app->plugins->isPluginEnabled('commerce')) {
-                $this->_sourceTypes[] = ProductEventSource::class;
+            foreach ($this->getTypeClasses() as $typeClass) {
+                foreach ($typeClass::discoverTypes() as $key => $typeInstance) {
+                    $typeInstances[$key] = $typeInstance;
+                }
             }
 
-            $event = new RegisterEventSourceTypesEvent(['types' => $this->_sourceTypes]);
-            $this->trigger(self::EVENT_REGISTER_SOURCE_TYPES, $event);
-            $this->_sourceTypes = $event->types;
+            $this->_types = $typeInstances;
         }
 
-        return $this->_sourceTypes;
+        return $this->_types;
     }
 
     /**
@@ -75,17 +83,9 @@ class Events extends Component
             $sources = [];
 
             $index = 0;
-            /** @var class-string<EventSource> $type */
-            foreach ($this->getSourceTypes() as $type) {
-                foreach ($type::sources() as $key => $params) {
-                    // @phpstan-ignore argument.templateType
-                    $sources[$key] = Craft::createObject([
-                        'class' => $type,
-                        'color' => Color::at($index),
-                        ...$params,
-                    ]);
-                    $index++;
-                }
+            foreach ($this->getTypes() as $key => $type) {
+                $sources[$key] = EventSource::fromType($type, color: Color::at($index));
+                $index++;
             }
 
             $event = new RegisterEventSourcesEvent(['sources' => $sources]);
@@ -118,22 +118,22 @@ class Events extends Component
         foreach ($this->getSources() as $key => $source) {
             if (
                 (! $sourceKeys || in_array($key, $sourceKeys)) &&
-                (! $user || $source->canView($user))
+                (! $user || $source->type->canView($user))
             ) {
-                /** @var ElementQuery<int, ElementInterface> $query */
-                $query = $source::elementType()::find();
 
-                $queryParams = $source->queryParams();
+                $query = $source->type->find();
+
+                $queryParams = $source->customQueryParams;
 
                 if ($date !== null) {
-                    $queryParams = [...$queryParams, $source->dateFieldHandle => $date];
+                    $queryParams = [...$queryParams, $source->type->dateFieldHandle => $date];
                 }
 
                 if ($extraQueryParams) {
                     $queryParams = [...$queryParams, ...$extraQueryParams];
                 }
 
-                if ($user && ! $source->canViewPeers($user)) {
+                if ($user && ! $source->type->canViewPeers($user)) {
                     $queryParams = [...$queryParams, 'authorId' => $user->id];
                 }
 
@@ -158,5 +158,22 @@ class Events extends Component
                 'iCalendarSequence' => new Expression('[[iCalendarSequence]] + 1'),
             ]
         );
+    }
+
+    private function getTypeClasses(): array
+    {
+        if (! $this->_typeClasses) {
+            $this->_typeClasses = [EntryEventType::class];
+
+            if (Craft::$app->plugins->isPluginEnabled('commerce')) {
+                $this->_typeClasses[] = ProductEventType::class;
+            }
+
+            $event = new RegisterEventTypesEvent(['types' => $this->_typeClasses]);
+            $this->trigger(self::EVENT_REGISTER_TYPES, $event);
+            $this->_typeClasses = $event->types;
+        }
+
+        return $this->_typeClasses;
     }
 }

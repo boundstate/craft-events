@@ -8,9 +8,9 @@ title: Events
 
 ## Constants
 
-### EVENT_REGISTER_SOURCE_TYPES
+### EVENT_REGISTER_TYPES
 
-See <span class="code">[RegisterEventSourceTypesEvent](../events/RegisterEventSourceTypesEvent.md '\\boundstate\\eventful\\events\\RegisterEventSourceTypesEvent'){ data-preview }</span>
+See <span class="code">[RegisterEventTypesEvent](../events/RegisterEventTypesEvent.md '\\boundstate\\eventful\\events\\RegisterEventTypesEvent'){ data-preview }</span>
 
 ### EVENT_REGISTER_SOURCES
 
@@ -29,15 +29,15 @@ public findDateField(ElementInterface|FieldLayoutProviderInterface $type): ?Even
 | `$type`    | <span class="code">[ElementInterface](https://docs.craftcms.com/api/v5/craft-base-elementinterface.html '\\craft\\base\\ElementInterface')\|[FieldLayoutProviderInterface](https://docs.craftcms.com/api/v5/craft-base-fieldlayoutproviderinterface.html '\\craft\\base\\FieldLayoutProviderInterface')</span> |     |
 | **return** | <span class="code">?[EventDate](../fields/EventDate.md '\\boundstate\\eventful\\fields\\EventDate')</span>                                                                                                                                                                                                     |     |
 
-### getSourceTypes
+### getTypes
 
 ```php
-public getSourceTypes(): class-string<EventSource>[]
+public getTypes(): array
 ```
 
-|            |                                                                                                                                   |     |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------- | --- |
-| **return** | <span class="code">class-string&lt;[EventSource](../base/EventSource.md '\\boundstate\\eventful\\base\\EventSource')&gt;[]</span> |     |
+|            |                                 |     |
+| ---------- | ------------------------------- | --- |
+| **return** | <span class="code">array</span> |     |
 
 ### getSources
 
@@ -45,9 +45,9 @@ public getSourceTypes(): class-string<EventSource>[]
 public getSources(): array<string,EventSource>
 ```
 
-|            |                                                                                                                                 |     |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------- | --- |
-| **return** | <span class="code">array&lt;string,[EventSource](../base/EventSource.md '\\boundstate\\eventful\\base\\EventSource')&gt;</span> |     |
+|            |                                                                                                                                     |     |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------------- | --- |
+| **return** | <span class="code">array&lt;string,[EventSource](../models/EventSource.md '\\boundstate\\eventful\\models\\EventSource')&gt;</span> |     |
 
 ### findSourceByKey
 
@@ -55,10 +55,10 @@ public getSources(): array<string,EventSource>
 public findSourceByKey(string $key): EventSource
 ```
 
-|            |                                                                                                             |     |
-| ---------- | ----------------------------------------------------------------------------------------------------------- | --- |
-| `$key`     | <span class="code">string</span>                                                                            |     |
-| **return** | <span class="code">[EventSource](../base/EventSource.md '\\boundstate\\eventful\\base\\EventSource')</span> |     |
+|            |                                                                                                                 |     |
+| ---------- | --------------------------------------------------------------------------------------------------------------- | --- |
+| `$key`     | <span class="code">string</span>                                                                                |     |
+| **return** | <span class="code">[EventSource](../models/EventSource.md '\\boundstate\\eventful\\models\\EventSource')</span> |     |
 
 ### getEvents
 

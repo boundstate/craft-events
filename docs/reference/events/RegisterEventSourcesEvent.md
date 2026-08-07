@@ -13,5 +13,5 @@ Event for customizing event sources.
 ### sources
 
 ```php
-public EventSource[] $sources
+public array<string,EventSource> $sources
 ```

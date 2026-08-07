@@ -2,7 +2,7 @@
 
 namespace boundstate\eventful\events;
 
-use boundstate\eventful\base\EventSource;
+use boundstate\eventful\models\EventSource;
 use yii\base\Event;
 
 /**
@@ -11,7 +11,7 @@ use yii\base\Event;
 class RegisterEventSourcesEvent extends Event
 {
     /**
-     * @var array<EventSource>
+     * @var array<string, EventSource>
      */
     public array $sources = [];
 }

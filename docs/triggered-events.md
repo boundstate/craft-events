@@ -12,15 +12,15 @@ This plugin triggers several events to allow greater customization for developer
 
 ## Events
 
-### [Register source types](reference/services/Events.md#event_register_source_types)
+### [Register types](reference/services/Events.md#event_register_types)
 
-Event triggered when registering types of event sources.
+Event triggered when registering types of events.
 
 ```php
 Event::on(
     Events::class,
-    Events::EVENT_REGISTER_SOURCE_TYPES,
-    function (RegisterEventSourceTypesEvent $e) {
+    Events::EVENT_REGISTER_TYPES,
+    function (RegisterEventTypesEvent $e) {
         $e->types[] = Meeting::class;
     }
 );
@@ -29,7 +29,7 @@ Event::on(
 ### [Register sources](reference/services/Events.md#event_register_sources)
 
 Event triggered when registering event sources.
-The built-in source types for entries and products will register an event source for each entry type and product type that has an event date field.
+The built-in types for entries and products will register an event source for each entry type and product type that has an event date field.
 
 ```php
 Event::on(

@@ -59,7 +59,7 @@
 {% endblock %}
 
 {% block sidebar %}
-  {% set showOrganizers = craft.app.editionHandle != 'solo' and settings.organizerFilterEnabled and sources|find(source => source.canViewPeers(currentUser)) is not empty %}
+  {% set showOrganizers = craft.app.editionHandle != 'solo' and settings.organizerFilterEnabled and sources|find(source => source.type.canViewPeers(currentUser)) is not empty %}
   {% if sources|length > 1 or showOrganizers %}
     <nav>
         <form id="calendar-form" class="calendar-filters">
@@ -68,7 +68,7 @@
                     name: 'sources',
                     class: 'calendar-filter colored',
                     options: sources|map((source, key) => {
-                        label: source.pluralDisplayname,
+                        label: source.pluralDisplayName,
                         value: key,
                         data: {
                             color: source.color
@@ -176,12 +176,12 @@
 
 {% block actionButton %}
     <div class="buttons">
-        {% if (creatableSources|length) == 1 %}
-            {% set source = creatableSources|first %}
-            <a class="btn submit add icon" href="{{ source.cpUrl }}">
-                New {{ source.displayName }}
+        {% if (creatableTypes|length) == 1 %}
+            {% set type = creatableTypes|first %}
+            <a class="btn submit add icon" href="{{ type.cpUrl }}">
+                New {{ type.displayName }}
             </a>
-        {% elseif (creatableSources|length) > 1 %}
+        {% elseif (creatableTypes|length) > 1 %}
             <div class="btngroup">
                 <button
                     type="button"
@@ -198,9 +198,9 @@
                 >
                     <ul>
                         <li>
-                            {% for source in creatableSources %}
-                                <a href="{{ source.cpUrl }}" tabindex="0">
-                                    New {{ source.displayName }}
+                            {% for type in creatableTypes %}
+                                <a href="{{ type.cpUrl }}" tabindex="0">
+                                    New {{ type.displayName }}
                                 </a>
                             {% endfor %}
                         </li>
@@ -255,7 +255,7 @@
         ></div>
     </div>
 
-    {% if creatableSources %}
+    {% if creatableTypes %}
         <div
             id="calendar-context-menu-trigger"
             aria-controls="calendar-context-menu"
@@ -263,9 +263,9 @@
         <div id="calendar-context-menu" class="menu menu--disclosure">
             <ul>
                 <li>
-                    {% for source in creatableSources %}
-                        <a href="{{ source.actionUrl }}" data-date-field-handle="{{ source.dateFieldHandle }}" tabindex="0">
-                            New {{ source.displayName }}
+                    {% for type in creatableTypes %}
+                        <a href="{{ type.actionUrl }}" data-date-field-handle="{{ type.dateFieldHandle }}" tabindex="0">
+                            New {{ type.displayName }}
                         </a>
                     {% endfor %}
                 </li>

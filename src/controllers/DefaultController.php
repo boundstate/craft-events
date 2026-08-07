@@ -2,13 +2,14 @@
 
 namespace boundstate\eventful\controllers;
 
-use boundstate\eventful\base\EventSource;
+use boundstate\eventful\base\EventType;
 use boundstate\eventful\enums\EventProp;
 use boundstate\eventful\enums\IcsMethod;
 use boundstate\eventful\Eventful;
 use boundstate\eventful\helpers\EventDateHelper;
 use boundstate\eventful\helpers\EventRenderer;
 use boundstate\eventful\models\EventDate;
+use boundstate\eventful\models\EventSource;
 use boundstate\eventful\web\assets\CpCalendarAsset;
 use Craft;
 use craft\base\Element;
@@ -45,6 +46,7 @@ class DefaultController extends Controller
         $this->requirePermission('accessPlugin-eventful');
 
         $settings = Eventful::getInstance()->settings;
+        $types = Eventful::getInstance()->events->getTypes();
         $sources = Eventful::getInstance()->events->getSources();
 
         $currentUser = static::currentUser();
@@ -56,15 +58,13 @@ class DefaultController extends Controller
 
         $viewableSources = array_filter(
             $sources,
-            fn (EventSource $source): bool => $source->canView($currentUser),
+            fn (EventSource $source): bool => $source->type->canView($currentUser),
         );
 
-        $creatableSources = [];
-        foreach ($viewableSources as $source) {
-            if ($source->canCreate($currentUser)) {
-                $creatableSources[$source->cpUrl] = $source;
-            }
-        }
+        $creatableTypes = array_filter(
+            $types,
+            fn (EventType $type): bool => $type->canCreate($currentUser),
+        );
 
         $this->view->registerAssetBundle(CpCalendarAsset::class);
         $this->view->registerJs('new Craft.Eventful.Calendar();');
@@ -76,7 +76,7 @@ class DefaultController extends Controller
             'initialView' => $view,
             'initialDate' => $initialDate->format('c'),
             'sources' => $viewableSources,
-            'creatableSources' => array_values($creatableSources),
+            'creatableTypes' => $creatableTypes,
             'icsUrl' => $calendarSecret ? "$calendarSecret.ics" : null,
             'extraEventSources' => array_map(fn ($source) => [
                 ...$source,
@@ -211,7 +211,7 @@ class DefaultController extends Controller
             /** @var Element $element */
             foreach ($elements as $element) {
                 /** @var EventDate $date */
-                $date = $element->getFieldValue($source->dateFieldHandle);
+                $date = $element->getFieldValue($source->type->dateFieldHandle);
 
                 foreach ($date->getOccurrences($constraint) as $recurrence) {
                     /** @var Recurrence $recurrence */
@@ -241,7 +241,7 @@ class DefaultController extends Controller
                         ],
 
                         // custom properties for HUD
-                        'sourceLabel' => $source->pluralDisplayName(),
+                        'sourceLabel' => $source->pluralDisplayName,
                         'dateDescription' => EventDateHelper::formatDate(
                             $recurrence,
                             allDay: $date->allDay,

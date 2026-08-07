@@ -1,10 +1,10 @@
 ---
-title: EntryEventSource
+title: EntryEventType
 ---
 
-# Class EntryEventSource
+# Class EntryEventType
 
-<small class="block">Extends <span class="code">[EventSource](../base/EventSource.md '\\boundstate\\eventful\\base\\EventSource')</span></small>
+<small class="block">Extends <span class="code">[EventType](../base/EventType.md '\\boundstate\\eventful\\base\\EventType')</span></small>
 
 ## Properties
 
@@ -22,29 +22,17 @@ public EntryType $entryType
 
 ## Methods
 
-### elementType
+### discoverTypes
 
-Returns the element type this source is for.
-
-```php
-public static elementType(): class-string<ElementInterface>
-```
-
-|            |                                                                                                                                                                       |     |
-| ---------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
-| **return** | <span class="code">class-string&lt;[ElementInterface](https://docs.craftcms.com/api/v5/craft-base-elementinterface.html '\\craft\\base\\ElementInterface')&gt;</span> |     |
-
-### sources
-
-Returns sources that should be registered for this type.
+Returns instances of this type.
 
 ```php
-public static sources(): array<string,array>
+public static discoverTypes(): array<string,EventType>
 ```
 
-|            |                                                     |                                               |
-| ---------- | --------------------------------------------------- | --------------------------------------------- |
-| **return** | <span class="code">array&lt;string,array&gt;</span> | keyed by source key, values are config arrays |
+|            |                                                                                                                           |     |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------- | --- |
+| **return** | <span class="code">array&lt;string,[EventType](../base/EventType.md '\\boundstate\\eventful\\base\\EventType')&gt;</span> |     |
 
 ### displayName
 
@@ -66,15 +54,17 @@ public pluralDisplayName(): string
 | ---------- | -------------------------------- | --- |
 | **return** | <span class="code">string</span> |     |
 
-### queryParams
+### find
+
+Returns a query for elements of this type.
 
 ```php
-public queryParams(): array
+public find(): EntryQuery
 ```
 
-|            |                                 |     |
-| ---------- | ------------------------------- | --- |
-| **return** | <span class="code">array</span> |     |
+|            |                                                                                                                                                |     |
+| ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| **return** | <span class="code">[EntryQuery](https://docs.craftcms.com/api/v5/craft-elements-db-entryquery.html '\\craft\\elements\\db\\EntryQuery')</span> |     |
 
 ### getCpUrl
 

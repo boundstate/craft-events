@@ -2,43 +2,41 @@
 
 namespace boundstate\eventful\models;
 
-use boundstate\eventful\base\EventSource;
+use boundstate\eventful\base\EventType;
 use boundstate\eventful\Eventful;
 use Craft;
+use craft\elements\db\EntryQuery;
 use craft\elements\Entry;
 use craft\elements\User;
 use craft\helpers\UrlHelper;
 use craft\models\EntryType;
 use craft\models\Section;
 
-class EntryEventSource extends EventSource
+class EntryEventType extends EventType
 {
     public Section $section;
 
     public EntryType $entryType;
 
-    public static function elementType(): string
+    public static function discoverTypes(): array
     {
-        return Entry::class;
-    }
+        $sections = Craft::$app->entries->getAllSections();
 
-    public static function sources(): array
-    {
-        $sources = [];
-        foreach (Craft::$app->entries->getAllSections() as $section) {
+        $types = [];
+        foreach ($sections as $section) {
             foreach ($section->getEntryTypes() as $entryType) {
                 $dateField = Eventful::getInstance()->events->findDateField($entryType);
                 if ($dateField) {
-                    $sources["entry:$section->handle:$entryType->handle"] = [
+                    $types["entry:$section->handle:$entryType->handle"] = new EntryEventType([
                         'dateFieldHandle' => $dateField->handle,
                         'section' => $section,
                         'entryType' => $entryType,
-                    ];
+                    ]);
                 }
             }
         }
 
-        return $sources;
+        return $types;
     }
 
     public function displayName(): string
@@ -51,12 +49,12 @@ class EntryEventSource extends EventSource
         return $this->section->name;
     }
 
-    public function queryParams(): array
+    // @phpstan-ignore missingType.generics
+    public function find(): EntryQuery
     {
-        return [
-            'section' => $this->section->handle,
-            'type' => $this->entryType->handle,
-        ];
+        return Entry::find()
+            ->section($this->section->handle)
+            ->type($this->entryType->handle);
     }
 
     public function getCpUrl(): string

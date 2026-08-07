@@ -2,40 +2,38 @@
 
 namespace boundstate\eventful\base;
 
-use craft\base\ElementInterface;
 use craft\base\Model;
+use craft\elements\db\ElementQuery;
 use craft\elements\User;
 use craft\helpers\Inflector;
 
 /**
- * @property string $label
  * @property-read ?string $cpUrl
  * @property-read ?string $actionUrl
  */
-abstract class EventSource extends Model
+abstract class EventType extends Model
 {
+    /**
+     * @var string Handle of the field that contains the event dates.
+     */
     public string $dateFieldHandle;
 
-    public string $color;
-
     /**
-     * Returns the element type this source is for.
+     * Returns instances of this type.
      *
-     * @return class-string<ElementInterface>
+     * @return array<string, EventType>
      */
-    abstract public static function elementType(): string;
-
-    /**
-     * Returns sources that should be registered for this type.
-     *
-     * @return array<string, array> keyed by source key, values are config arrays
-     */
-    public static function sources(): array
+    public static function discoverTypes(): array
     {
         return [];
     }
 
-    abstract public function queryParams(): array;
+    /**
+     * Returns a query for elements of this type.
+     *
+     * @phpstan-ignore missingType.generics
+     */
+    abstract public function find(): ElementQuery;
 
     abstract public function displayName(): string;
 
