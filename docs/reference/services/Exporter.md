@@ -34,7 +34,7 @@ public toIcs(ElementInterface|ElementInterface[] $elements): string
 Returns ICS file contents for each calendar event.
 
 ```php
-public toMultipleIcs(ElementInterface|ElementInterface[] $elements, User|User[]|string|string[] $attendees, ?string $method): string[]
+public toMultipleIcs(ElementInterface|ElementInterface[] $elements, User|User[]|string|string[] $attendees = [], ?string $method = null): string[]
 ```
 
 |              |                                                                                                                                                                                                                                                                              |                                                           |

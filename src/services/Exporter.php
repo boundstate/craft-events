@@ -58,8 +58,8 @@ class Exporter extends Component
      */
     public function toMultipleIcs(
         mixed $elements,
-        mixed $attendees,
-        ?string $method,
+        mixed $attendees = [],
+        ?string $method = null,
     ): array {
         if (! is_array($elements)) {
             $elements = [$elements];
@@ -103,8 +103,7 @@ class Exporter extends Component
             ->setEnd($date->end)
             ->setSummary(EventRenderer::render($element, EventProp::TITLE, ics: true))
             ->setDescription(EventRenderer::render($element, EventProp::DESCRIPTION, ics: true))
-            ->setLocation(EventRenderer::render($element, EventProp::LOCATION, ics: true),
-            );
+            ->setLocation(EventRenderer::render($element, EventProp::LOCATION, ics: true));
 
         if ($date->rule) {
             $event->setRule($date->rule);

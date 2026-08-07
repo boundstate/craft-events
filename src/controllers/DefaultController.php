@@ -285,8 +285,7 @@ class DefaultController extends Controller
 
         $icsContents = Eventful::getInstance()->exporter->toMultipleIcs(
             $element,
-            [],
-            Calendar::METHOD_PUBLISH,
+            method: Calendar::METHOD_PUBLISH,
         );
 
         if (count($icsContents) === 1) {
