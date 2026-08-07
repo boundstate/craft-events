@@ -2,7 +2,7 @@
 
 namespace boundstate\eventful\events;
 
-use boundstate\eventful\models\EventSource;
+use boundstate\eventful\base\EventSource;
 use yii\base\Event;
 
 /**

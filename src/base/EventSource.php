@@ -1,6 +1,6 @@
 <?php
 
-namespace boundstate\eventful\models;
+namespace boundstate\eventful\base;
 
 use craft\base\ElementInterface;
 use craft\base\Model;

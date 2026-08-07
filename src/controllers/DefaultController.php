@@ -2,12 +2,12 @@
 
 namespace boundstate\eventful\controllers;
 
+use boundstate\eventful\base\EventSource;
 use boundstate\eventful\enums\EventProp;
 use boundstate\eventful\Eventful;
 use boundstate\eventful\helpers\EventDateHelper;
 use boundstate\eventful\helpers\EventRenderer;
 use boundstate\eventful\models\EventDate;
-use boundstate\eventful\models\EventSource;
 use boundstate\eventful\models\IcsCalendar;
 use boundstate\eventful\web\assets\CpCalendarAsset;
 use Craft;

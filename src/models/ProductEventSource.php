@@ -2,6 +2,7 @@
 
 namespace boundstate\eventful\models;
 
+use boundstate\eventful\base\EventSource;
 use boundstate\eventful\fields\EventDate as EventDateField;
 use craft\commerce\elements\Product;
 use craft\commerce\models\ProductType;

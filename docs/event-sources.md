@@ -16,5 +16,5 @@ use the [Register Sources](triggered-events.md#eventsevent_register_sources){ da
 
 To allow a custom [element type](https://craftcms.com/docs/5.x/extend/element-types.html) to be displayed on the calendar:
 
-1. Subclass [`EventSource`](reference/models/EventSource.md)
+1. Subclass [`EventSource`](reference/base/EventSource.md)
 2. Use the [Register Source Types](triggered-events.md#eventsevent_register_source_types){ data-preview } event to register your custom class

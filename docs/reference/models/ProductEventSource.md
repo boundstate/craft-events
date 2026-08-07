@@ -4,7 +4,7 @@ title: ProductEventSource
 
 # Class ProductEventSource
 
-<small class="block">Extends <span class="code">[EventSource](EventSource.md '\\boundstate\\eventful\\models\\EventSource')</span></small>
+<small class="block">Extends <span class="code">[EventSource](../base/EventSource.md '\\boundstate\\eventful\\base\\EventSource')</span></small>
 
 ## Properties
 

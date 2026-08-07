@@ -2,6 +2,7 @@
 
 namespace boundstate\eventful\models;
 
+use boundstate\eventful\base\EventSource;
 use boundstate\eventful\Eventful;
 use Craft;
 use craft\elements\Entry;

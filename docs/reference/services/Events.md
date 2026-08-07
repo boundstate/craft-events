@@ -35,9 +35,9 @@ public findDateField(ElementInterface|FieldLayoutProviderInterface $type): ?Even
 public getSourceTypes(): class-string<EventSource>[]
 ```
 
-|            |                                                                                                                                       |     |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------- | --- |
-| **return** | <span class="code">class-string&lt;[EventSource](../models/EventSource.md '\\boundstate\\eventful\\models\\EventSource')&gt;[]</span> |     |
+|            |                                                                                                                                   |     |
+| ---------- | --------------------------------------------------------------------------------------------------------------------------------- | --- |
+| **return** | <span class="code">class-string&lt;[EventSource](../base/EventSource.md '\\boundstate\\eventful\\base\\EventSource')&gt;[]</span> |     |
 
 ### getSources
 
@@ -45,9 +45,9 @@ public getSourceTypes(): class-string<EventSource>[]
 public getSources(): array<string,EventSource>
 ```
 
-|            |                                                                                                                                     |     |
-| ---------- | ----------------------------------------------------------------------------------------------------------------------------------- | --- |
-| **return** | <span class="code">array&lt;string,[EventSource](../models/EventSource.md '\\boundstate\\eventful\\models\\EventSource')&gt;</span> |     |
+|            |                                                                                                                                 |     |
+| ---------- | ------------------------------------------------------------------------------------------------------------------------------- | --- |
+| **return** | <span class="code">array&lt;string,[EventSource](../base/EventSource.md '\\boundstate\\eventful\\base\\EventSource')&gt;</span> |     |
 
 ### findSourceByKey
 
@@ -55,10 +55,10 @@ public getSources(): array<string,EventSource>
 public findSourceByKey(string $key): EventSource
 ```
 
-|            |                                                                                                                 |     |
-| ---------- | --------------------------------------------------------------------------------------------------------------- | --- |
-| `$key`     | <span class="code">string</span>                                                                                |     |
-| **return** | <span class="code">[EventSource](../models/EventSource.md '\\boundstate\\eventful\\models\\EventSource')</span> |     |
+|            |                                                                                                             |     |
+| ---------- | ----------------------------------------------------------------------------------------------------------- | --- |
+| `$key`     | <span class="code">string</span>                                                                            |     |
+| **return** | <span class="code">[EventSource](../base/EventSource.md '\\boundstate\\eventful\\base\\EventSource')</span> |     |
 
 ### getEvents
 

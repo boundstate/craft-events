@@ -2,13 +2,13 @@
 
 namespace boundstate\eventful\services;
 
+use boundstate\eventful\base\EventSource;
 use boundstate\eventful\db\Table;
 use boundstate\eventful\enums\Color;
 use boundstate\eventful\events\RegisterEventSourcesEvent;
 use boundstate\eventful\events\RegisterEventSourceTypesEvent;
 use boundstate\eventful\fields\EventDate as EventDateField;
 use boundstate\eventful\models\EntryEventSource;
-use boundstate\eventful\models\EventSource;
 use boundstate\eventful\models\ProductEventSource;
 use Craft;
 use craft\base\ElementInterface;
