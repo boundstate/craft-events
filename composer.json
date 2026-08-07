@@ -3,6 +3,12 @@
   "version": "1.0.0",
   "type": "craft-plugin",
   "license": "proprietary",
+  "authors": [
+    {
+      "name": "Bound State Software",
+      "homepage": "https://boundstatesoftware.com"
+    }
+  ],
   "require": {
     "ext-zip": "*",
     "php": ">=8.2",
