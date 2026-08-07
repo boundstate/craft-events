@@ -6,10 +6,6 @@ title: IcsEvent
 
 <small class="block">Extends <span class="code">[Model](https://docs.craftcms.com/api/v5/craft-base-model.html '\\craft\\base\\Model')</span></small>
 
-## Constants
-
-### STATUS_CANCELLED
-
 ## Properties
 
 ### now
@@ -99,13 +95,13 @@ public getEnd(): ?DateTime
 ### setStatus
 
 ```php
-public setStatus(string $status): static
+public setStatus(?IcsStatus $status): static
 ```
 
-|            |                                  |     |
-| ---------- | -------------------------------- | --- |
-| `$status`  | <span class="code">string</span> |     |
-| **return** | <span class="code">static</span> |     |
+|            |                                                                                                          |     |
+| ---------- | -------------------------------------------------------------------------------------------------------- | --- |
+| `$status`  | <span class="code">?[IcsStatus](../enums/IcsStatus.md '\\boundstate\\eventful\\enums\\IcsStatus')</span> |     |
+| **return** | <span class="code">static</span>                                                                         |     |
 
 ### setSummary
 

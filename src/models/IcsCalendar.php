@@ -2,6 +2,7 @@
 
 namespace boundstate\eventful\models;
 
+use boundstate\eventful\enums\IcsMethod;
 use Craft;
 use craft\base\Model;
 use DateTime;
@@ -11,25 +12,6 @@ use Sabre\VObject\Component\VTimeZone;
 
 class IcsCalendar extends Model
 {
-    /**
-     * Post notification of an event.
-     * Used primarily as a method of advertising the existence of an event.
-     */
-    const METHOD_PUBLISH = 'PUBLISH';
-
-    /**
-     * Make a request for an event.
-     * This is an explicit invitation to one or more "Attendees".
-     * Event Requests are also used to update or change an existing event.
-     * Clients that cannot handle REQUEST may degrade the event to view it as a PUBLISH.
-     */
-    const METHOD_REQUEST = 'REQUEST';
-
-    /**
-     * Cancel one or more instances of an existing event.
-     */
-    const METHOD_CANCEL = 'CANCEL';
-
     private readonly VCalendar $_doc;
 
     /**
@@ -48,9 +30,13 @@ class IcsCalendar extends Model
         parent::__construct($config);
     }
 
-    public function setMethod(string $method): static
+    public function setMethod(?IcsMethod $method): static
     {
-        $this->_doc->METHOD = $method;
+        if ($method === null) {
+            $this->_doc->remove('METHOD');
+        } else {
+            $this->_doc->METHOD = $method->value;
+        }
 
         return $this;
     }

@@ -3,13 +3,14 @@
 namespace boundstate\eventful\services;
 
 use boundstate\eventful\enums\EventProp;
+use boundstate\eventful\enums\IcsMethod;
+use boundstate\eventful\enums\IcsStatus;
 use boundstate\eventful\Eventful;
 use boundstate\eventful\events\AfterBuildIcsEvent;
 use boundstate\eventful\helpers\EventRenderer;
 use boundstate\eventful\helpers\UrlHelper;
 use boundstate\eventful\models\EventDate;
 use boundstate\eventful\models\IcsCalendar;
-use boundstate\eventful\models\IcsEvent;
 use boundstate\eventful\records\Metadata;
 use Craft;
 use craft\base\ElementInterface;
@@ -53,13 +54,12 @@ class Exporter extends Component
      *
      * @param  ElementInterface|array<ElementInterface>  $elements
      * @param  User|array<User>|string|array<string>  $attendees  Array of users or in the format: `[email => name]`.
-     * @param  ?string  $method  https://datatracker.ietf.org/doc/html/rfc2446#section-3.2
      * @return string[]
      */
     public function toMultipleIcs(
         mixed $elements,
+        ?IcsMethod $method = null,
         mixed $attendees = [],
-        ?string $method = null,
     ): array {
         if (! is_array($elements)) {
             $elements = [$elements];
@@ -70,7 +70,12 @@ class Exporter extends Component
         return array_map(function ($element) use ($attendees, $method): string {
             $calendar = new IcsCalendar;
             $calendar->setMethod($method);
-            $this->addEvent($calendar, $element, $attendees, $method);
+            $this->addEvent(
+                $calendar,
+                $element,
+                status: $method === IcsMethod::CANCEL ? IcsStatus::CANCELLED : null,
+                attendees: $attendees,
+            );
             $calendar->addTimezones();
 
             return $calendar->serialize();
@@ -85,8 +90,8 @@ class Exporter extends Component
     private function addEvent(
         IcsCalendar $calendar,
         ElementInterface $element,
+        ?IcsStatus $status = null,
         array $attendees = [],
-        ?string $method = null,
     ): void {
         $dateField = Eventful::getInstance()->events->findDateField($element);
 
@@ -99,6 +104,7 @@ class Exporter extends Component
             ->addEvent()
             ->setUid($element->uid)
             ->setSequence($metadata->iCalendarSequence ?? 0)
+            ->setStatus($status)
             ->setStart($date->start)
             ->setEnd($date->end)
             ->setSummary(EventRenderer::render($element, EventProp::TITLE, ics: true))
@@ -107,10 +113,6 @@ class Exporter extends Component
 
         if ($date->rule) {
             $event->setRule($date->rule);
-        }
-
-        if ($method === IcsCalendar::METHOD_CANCEL) {
-            $event->setStatus(IcsEvent::STATUS_CANCELLED);
         }
 
         $host = UrlHelper::hostname();

@@ -2,6 +2,7 @@
 
 namespace boundstate\eventful\models;
 
+use boundstate\eventful\enums\IcsStatus;
 use boundstate\eventful\helpers\DateHelper;
 use boundstate\eventful\helpers\UrlHelper;
 use craft\base\Model;
@@ -13,8 +14,6 @@ use Sabre\VObject\Component\VEvent;
 
 class IcsEvent extends Model
 {
-    const STATUS_CANCELLED = 'CANCELLED';
-
     public static ?int $now = null;
 
     private readonly VEvent $_doc;
@@ -75,9 +74,13 @@ class IcsEvent extends Model
         return $this->_end;
     }
 
-    public function setStatus(string $status): static
+    public function setStatus(?IcsStatus $status): static
     {
-        $this->_doc->STATUS = $status;
+        if ($status === null) {
+            $this->_doc->remove('STATUS');
+        } else {
+            $this->_doc->STATUS = $status->value;
+        }
 
         return $this;
     }

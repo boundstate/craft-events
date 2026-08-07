@@ -6,26 +6,6 @@ title: IcsCalendar
 
 <small class="block">Extends <span class="code">[Model](https://docs.craftcms.com/api/v5/craft-base-model.html '\\craft\\base\\Model')</span></small>
 
-## Constants
-
-### METHOD_PUBLISH
-
-Post notification of an event.
-
-Used primarily as a method of advertising the existence of an event.
-
-### METHOD_REQUEST
-
-Make a request for an event.
-
-This is an explicit invitation to one or more "Attendees".
-Event Requests are also used to update or change an existing event.
-Clients that cannot handle REQUEST may degrade the event to view it as a PUBLISH.
-
-### METHOD_CANCEL
-
-Cancel one or more instances of an existing event.
-
 ## Methods
 
 ### __construct
@@ -42,13 +22,13 @@ public __construct(array $config = []): mixed
 ### setMethod
 
 ```php
-public setMethod(string $method): static
+public setMethod(?IcsMethod $method): static
 ```
 
-|            |                                  |     |
-| ---------- | -------------------------------- | --- |
-| `$method`  | <span class="code">string</span> |     |
-| **return** | <span class="code">static</span> |     |
+|            |                                                                                                          |     |
+| ---------- | -------------------------------------------------------------------------------------------------------- | --- |
+| `$method`  | <span class="code">?[IcsMethod](../enums/IcsMethod.md '\\boundstate\\eventful\\enums\\IcsMethod')</span> |     |
+| **return** | <span class="code">static</span>                                                                         |     |
 
 ### addEvent
 
