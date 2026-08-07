@@ -20,8 +20,8 @@ Event triggered when registering types of event sources.
 Event::on(
     Events::class,
     Events::EVENT_REGISTER_SOURCE_TYPES,
-    function (RegisterSourceTypesEvent $event) {
-        $event->types[] = Meeting::class;
+    function (RegisterEventSourceTypesEvent $e) {
+        $e->types[] = Meeting::class;
     }
 );
 ```
@@ -35,10 +35,10 @@ The built-in source types for entries and products will register an event source
 Event::on(
     Events::class,
     Events::EVENT_REGISTER_SOURCES,
-    function (RegisterSourceEvent $event) {
-        foreach ($event->sources as $key => $source) {
+    function (RegisterEventSourcesEvent $e) {
+        foreach ($e->sources as $key => $source) {
             if ($key === 'entry:meetings:meeting') {
-                $source->color = Color::PISTACHIO;
+                $source->color = Color::PISTACHIO->value;
             }
         }
     }
