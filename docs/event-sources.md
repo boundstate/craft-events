@@ -10,11 +10,11 @@ a new source will be automatically displayed on the calendar.
 ## Customization
 
 To customize the sources displayed on the calendar,
-use the [Register Sources](triggered-events.md#eventsevent_register_sources){ data-preview } event.
+use the [Register Sources](triggered-events.md#register-sources){ data-preview } event.
 
 ## Custom types
 
 To allow a custom [element type](https://craftcms.com/docs/5.x/extend/element-types.html) to be displayed on the calendar:
 
 1. Subclass [`EventType`](reference/base/EventType.md)
-2. Use the [Register Source Types](triggered-events.md#eventsevent_register_types){ data-preview } event to register your custom class
+2. Use the [Register Source Types](triggered-events.md#register-types){ data-preview } event to register your custom class
