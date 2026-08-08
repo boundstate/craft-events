@@ -75,14 +75,14 @@ public getElementValidationRules(): array
 ### serializeValue
 
 ```php
-public serializeValue(?EventDate $value, ?ElementInterface $element): mixed
+public serializeValue(?EventDate $value, ?ElementInterface $element): ?array
 ```
 
 |            |                                                                                                                                                    |     |
 | ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
 | `$value`   | <span class="code">?[EventDate](../models/EventDate.md '\\boundstate\\eventful\\models\\EventDate')</span>                                         |     |
 | `$element` | <span class="code">?[ElementInterface](https://docs.craftcms.com/api/v5/craft-base-elementinterface.html '\\craft\\base\\ElementInterface')</span> |     |
-| **return** | <span class="code">mixed</span>                                                                                                                    |     |
+| **return** | <span class="code">?array</span>                                                                                                                   |     |
 
 ### queryCondition
 
@@ -101,6 +101,18 @@ public static queryCondition(array $instances, mixed $value, array& $params): ar
 
 ```php
 public normalizeValue(mixed $value, ?ElementInterface $element): mixed
+```
+
+|            |                                                                                                                                                    |     |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | --- |
+| `$value`   | <span class="code">mixed</span>                                                                                                                    |     |
+| `$element` | <span class="code">?[ElementInterface](https://docs.craftcms.com/api/v5/craft-base-elementinterface.html '\\craft\\base\\ElementInterface')</span> |     |
+| **return** | <span class="code">mixed</span>                                                                                                                    |     |
+
+### normalizeValueFromRequest
+
+```php
+public normalizeValueFromRequest(mixed $value, ?ElementInterface $element): mixed
 ```
 
 |            |                                                                                                                                                    |     |

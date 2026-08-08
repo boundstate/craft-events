@@ -34,9 +34,20 @@ class EventDate extends Field implements PreviewableFieldInterface, SortableFiel
             'start' => Schema::TYPE_DATETIME,
             'end' => Schema::TYPE_DATETIME,
             'timezone' => Schema::TYPE_STRING,
+
+            // recurrence
+            'freq' => Schema::TYPE_STRING,
+            'inDates' => Schema::TYPE_JSON,
+            'exDates' => Schema::TYPE_JSON,
+            'interval' => Schema::TYPE_INTEGER,
+            'byDay' => Schema::TYPE_JSON,
+            'byMonthDay' => Schema::TYPE_JSON,
+            'count' => Schema::TYPE_INTEGER,
+            'until' => Schema::TYPE_DATETIME,
+
+            // denormalized for querying
             'firstStart' => Schema::TYPE_DATETIME,
             'lastEnd' => Schema::TYPE_DATETIME,
-            'rule' => Schema::TYPE_STRING,
         ];
     }
 
@@ -72,21 +83,49 @@ class EventDate extends Field implements PreviewableFieldInterface, SortableFiel
     public function serializeValue(
         mixed $value,
         ?ElementInterface $element,
-    ): mixed {
+    ): ?array {
         if (! $value) {
             return null;
         }
 
-        return [
+        $serialized = [
             'start' => Db::prepareDateForDb($value->start),
             'end' => Db::prepareDateForDb($value->end),
             'timezone' => $this->allDay
                 ? Craft::$app->timeZone
                 : $value->timezone,
-            'firstStart' => Db::prepareDateForDb($value->getFirstStartDate()),
-            'lastEnd' => Db::prepareDateForDb($value->getLastEndDate()),
-            'rule' => $value->getRule()?->getString(),
         ];
+
+        if ($value->repeat && $value->freq) {
+            $serialized['freq'] = $value->freq;
+            $serialized['interval'] = $value->interval;
+
+            // denormalized for querying
+            $serialized['firstStart'] = Db::prepareDateForDb($value->getFirstStartDate());
+            $serialized['lastEnd'] = Db::prepareDateForDb($value->getLastEndDate());
+
+            if (! empty($value->inDates)) {
+                $serialized['inDates'] = $value->inDates;
+            }
+
+            if (! empty($value->exDates)) {
+                $serialized['exDates'] = $value->exDates;
+            }
+
+            if ($value->repeatsWeekly() || ($value->repeatsMonthly() && ! empty($value->byDay))) {
+                $serialized['byDay'] = $value->byDay;
+            } elseif ($value->repeatsMonthly()) {
+                $serialized['byMonthDay'] = $value->byMonthDay;
+            }
+
+            if ($value->repeatsForCount()) {
+                $serialized['count'] = $value->count;
+            } elseif ($value->repeatsUntil()) {
+                $serialized['until'] = Db::prepareDateForDb($value->until);
+            }
+        }
+
+        return $serialized;
     }
 
     public static function queryCondition(
@@ -137,29 +176,14 @@ class EventDate extends Field implements PreviewableFieldInterface, SortableFiel
         return parent::queryCondition($instances, $value, $params);
     }
 
-    public function normalizeValue(
-        mixed $value,
-        ?ElementInterface $element,
-    ): mixed {
-        if ($value instanceof EventDateModel) {
-            // already normalized
-            return $value;
-        }
+    public function normalizeValue(mixed $value, ?ElementInterface $element): mixed
+    {
+        return $this->normalizeValueInternal($value, $element, false);
+    }
 
-        if (! $value || ! is_array($value)) {
-            return null;
-        }
-
-        $value['allDay'] = $this->allDay;
-
-        // from database or POST data
-        unset($value['firstStart']);
-        unset($value['lastEnd']);
-
-        return new EventDateModel([
-            'allowNeverEnding' => $this->allowNeverEnding,
-            ...$value,
-        ]);
+    public function normalizeValueFromRequest(mixed $value, ?ElementInterface $element): mixed
+    {
+        return $this->normalizeValueInternal($value, $element, true);
     }
 
     public function getSortOption(): array
@@ -207,10 +231,10 @@ class EventDate extends Field implements PreviewableFieldInterface, SortableFiel
         ?ElementInterface $element = null,
     ): string {
         $freqOptions = [
-            ['label' => 'day', 'value' => 'DAILY'],
-            ['label' => 'week', 'value' => 'WEEKLY'],
-            ['label' => 'month', 'value' => 'MONTHLY'],
-            ['label' => 'year', 'value' => 'YEARLY'],
+            ['label' => 'day', 'value' => EventDateModel::FREQ_DAILY],
+            ['label' => 'week', 'value' => EventDateModel::FREQ_WEEKLY],
+            ['label' => 'month', 'value' => EventDateModel::FREQ_MONTHLY],
+            ['label' => 'year', 'value' => EventDateModel::FREQ_YEARLY],
         ];
 
         $dayOptions = [
@@ -258,6 +282,39 @@ class EventDate extends Field implements PreviewableFieldInterface, SortableFiel
             ->renderTemplate('eventful/fields/EventDate/settings', [
                 'field' => $this,
             ]);
+    }
+
+    private function normalizeValueInternal(mixed $value, ?ElementInterface $element, bool $fromRequest): ?EventDateModel
+    {
+        if ($value instanceof EventDateModel) {
+            // already normalized
+            return $value;
+        }
+
+        if (! $value || ! is_array($value)) {
+            return null;
+        }
+
+        $value['allDay'] = $this->allDay;
+        $value['allowNeverEnding'] = $this->allowNeverEnding;
+
+        if (! $fromRequest) {
+            // from database
+
+            // infer properties that aren't stored in database
+            if (! empty($value['freq'])) {
+                $value['repeat'] = true;
+                $value['ends'] = isset($value['count'])
+                    ? EventDateModel::ENDS_COUNT
+                    : EventDateModel::ENDS_UNTIL;
+            }
+
+            // unset denormalized properties
+            unset($value['firstStart']);
+            unset($value['lastEnd']);
+        }
+
+        return new EventDateModel($value);
     }
 }
 

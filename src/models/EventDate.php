@@ -21,9 +21,22 @@ use Recurr\Transformer\TextTransformer;
 
 /**
  * @property-read ?Rule $rule
+ * @property-read ?string $repeatDescription
  */
 class EventDate extends Model
 {
+    const FREQ_DAILY = 'DAILY';
+
+    const FREQ_WEEKLY = 'WEEKLY';
+
+    const FREQ_MONTHLY = 'MONTHLY';
+
+    const FREQ_YEARLY = 'YEARLY';
+
+    const ENDS_COUNT = 'count';
+
+    const ENDS_UNTIL = 'until';
+
     public bool $allowNeverEnding = false;
 
     public ?DateTime $start = null;
@@ -36,9 +49,9 @@ class EventDate extends Model
 
     public bool $repeat = false;
 
-    public int $interval = 1;
+    public ?int $interval = 1;
 
-    public string $freq = 'DAILY';
+    public ?string $freq = null;
 
     public array $byDay = [];
 
@@ -46,7 +59,7 @@ class EventDate extends Model
 
     public ?string $ends = null;
 
-    public ?int $count = null;
+    public ?int $count = 3;
 
     public ?DateTime $until = null;
 
@@ -109,8 +122,10 @@ class EventDate extends Model
             }
         }
 
-        // if rule is set, determine other properties from it
-        if (! empty($config['rule'])) {
+        if (empty($config['freq']) && ! empty($config['rule'])) {
+            // legacy behaviour to handle when rule was stored in database,
+            // but other attributes were not
+
             $config['repeat'] = true;
 
             $rule = new Rule($config['rule'], $config['start'], $config['end']);
@@ -132,10 +147,10 @@ class EventDate extends Model
             asort($config['inDates']);
 
             if ($count = $rule->getCount()) {
-                $config['ends'] = 'count';
+                $config['ends'] = self::ENDS_COUNT;
                 $config['count'] = $count;
             } elseif ($until = $rule->getUntil()) {
-                $config['ends'] = 'until';
+                $config['ends'] = self::ENDS_UNTIL;
                 $config['until'] = $until;
             }
         }
@@ -145,9 +160,29 @@ class EventDate extends Model
         parent::__construct($config);
     }
 
+    public function repeatsForCount(): bool
+    {
+        return $this->ends === self::ENDS_COUNT;
+    }
+
+    public function repeatsUntil(): bool
+    {
+        return $this->ends === self::ENDS_UNTIL;
+    }
+
+    public function repeatsWeekly(): bool
+    {
+        return $this->freq === self::FREQ_WEEKLY;
+    }
+
+    public function repeatsMonthly(): bool
+    {
+        return $this->freq === self::FREQ_MONTHLY;
+    }
+
     public function getRule(?bool $forceRefresh = false): ?Rule
     {
-        if (! $this->repeat) {
+        if (! $this->repeat || ! $this->start || ! $this->end) {
             return null;
         }
 
@@ -166,12 +201,10 @@ class EventDate extends Model
             if ($this->byMonthDay) {
                 $rule->setByMonthDay($this->byMonthDay);
             }
-            if ($this->ends === 'count') {
+            if ($this->repeatsForCount() && $this->count) {
                 $rule->setCount($this->count);
-            } elseif ($this->ends === 'until') {
-                if ($this->until) {
-                    $rule->setUntil($this->until);
-                }
+            } elseif ($this->repeatsUntil() && $this->until) {
+                $rule->setUntil($this->until);
             }
 
             $this->_rule = $rule;
@@ -187,39 +220,36 @@ class EventDate extends Model
             [['start', 'end', 'until'], DateTimeValidator::class],
             [['end', 'timezone'], 'required', 'when' => fn (EventDate $model): bool => ! $model->allDay],
             ['repeat', 'boolean'],
+            [['interval'], 'required', 'when' => fn (EventDate $model): bool => (bool) $model->repeat],
             [
                 ['interval', 'count'],
                 'number',
                 'integerOnly' => true,
                 'min' => 1,
+                'when' => fn (EventDate $model): bool => (bool) $model->repeat,
             ],
+            [['byDay', 'byMonthDay'], 'safe'],
             [
                 'byDay',
                 'required',
-                'when' => fn (EventDate $model): bool => $model->freq === 'WEEKLY',
+                'when' => fn (EventDate $model): bool => $model->repeatsWeekly(),
             ],
-            [
-                'byMonthDay',
-                'required',
-                'when' => fn (EventDate $model): bool => $model->freq === 'MONTHLY' &&
-                    empty($model->byDay),
-            ],
-            ['ends', 'required', 'when' => fn (EventDate $model): bool => $model->repeat && ! $model->allowNeverEnding],
+            ['ends', 'required', 'when' => fn (EventDate $model): bool => (bool) $model->repeat && ! $model->allowNeverEnding],
             [
                 'count',
                 'required',
-                'when' => fn (EventDate $model): bool => $model->repeat && $model->ends === 'count',
+                'when' => fn (EventDate $model): bool => (bool) $model->repeat && $model->repeatsForCount(),
             ],
             [
                 'until',
                 'required',
-                'when' => fn (EventDate $model): bool => $model->repeat && $model->ends === 'until',
+                'when' => fn (EventDate $model): bool => (bool) $model->repeat && $model->repeatsUntil(),
             ],
             [
                 'until',
                 'validateUntil',
                 'skipOnError' => true,
-                'when' => fn (EventDate $model): bool => $model->repeat && $model->ends === 'until',
+                'when' => fn (EventDate $model): bool => (bool) $model->freq && $model->repeatsUntil(),
             ],
         ];
     }
@@ -315,7 +345,7 @@ class EventDate extends Model
     {
         $lastEndDate = $this->getLastEndDate();
 
-        return (bool) $lastEndDate && $lastEndDate < new DateTime;
+        return $lastEndDate && $lastEndDate < new DateTime;
     }
 
     private static function toDateTime(

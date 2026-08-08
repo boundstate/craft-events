@@ -248,10 +248,10 @@
                         name: 'count'|namespaceInputName(name),
                         class: 'input-short',
                         type: 'number',
-                        suffix: value.count ?? 3 == 1
+                        suffix: value.count == 1
                             ? 'occurrence'
                             : 'occurrences',
-                        value: value.count ?? 3,
+                        value: value.count,
                         min: 1
                     })
                 }}

@@ -6,6 +6,20 @@ title: EventDate
 
 <small class="block">Extends <span class="code">[Model](https://docs.craftcms.com/api/v5/craft-base-model.html '\\craft\\base\\Model')</span></small>
 
+## Constants
+
+### FREQ_DAILY
+
+### FREQ_WEEKLY
+
+### FREQ_MONTHLY
+
+### FREQ_YEARLY
+
+### ENDS_COUNT
+
+### ENDS_UNTIL
+
 ## Properties
 
 ### allowNeverEnding
@@ -47,13 +61,13 @@ public bool $repeat
 ### interval
 
 ```php
-public int $interval
+public ?int $interval
 ```
 
 ### freq
 
 ```php
-public string $freq
+public ?string $freq
 ```
 
 ### byDay
@@ -110,6 +124,46 @@ public __construct(mixed $config = []): mixed
 | ---------- | ------------------------------- | --- |
 | `$config`  | <span class="code">mixed</span> |     |
 | **return** | <span class="code">mixed</span> |     |
+
+### repeatsForCount
+
+```php
+public repeatsForCount(): bool
+```
+
+|            |                                |     |
+| ---------- | ------------------------------ | --- |
+| **return** | <span class="code">bool</span> |     |
+
+### repeatsUntil
+
+```php
+public repeatsUntil(): bool
+```
+
+|            |                                |     |
+| ---------- | ------------------------------ | --- |
+| **return** | <span class="code">bool</span> |     |
+
+### repeatsWeekly
+
+```php
+public repeatsWeekly(): bool
+```
+
+|            |                                |     |
+| ---------- | ------------------------------ | --- |
+| **return** | <span class="code">bool</span> |     |
+
+### repeatsMonthly
+
+```php
+public repeatsMonthly(): bool
+```
+
+|            |                                |     |
+| ---------- | ------------------------------ | --- |
+| **return** | <span class="code">bool</span> |     |
 
 ### getRule
 
