@@ -42,6 +42,7 @@ class EventDate extends Field implements PreviewableFieldInterface, SortableFiel
             'interval' => Schema::TYPE_INTEGER,
             'byDay' => Schema::TYPE_JSON,
             'byMonthDay' => Schema::TYPE_JSON,
+            'ends' => Schema::TYPE_STRING,
             'count' => Schema::TYPE_INTEGER,
             'until' => Schema::TYPE_DATETIME,
 
@@ -99,6 +100,7 @@ class EventDate extends Field implements PreviewableFieldInterface, SortableFiel
         if ($value->repeat && $value->freq) {
             $serialized['freq'] = $value->freq;
             $serialized['interval'] = $value->interval;
+            $serialized['ends'] = $value->ends;
 
             // denormalized for querying
             $serialized['firstStart'] = Db::prepareDateForDb($value->getFirstStartDate());
@@ -304,9 +306,6 @@ class EventDate extends Field implements PreviewableFieldInterface, SortableFiel
             // infer properties that aren't stored in database
             if (! empty($value['freq'])) {
                 $value['repeat'] = true;
-                $value['ends'] = isset($value['count'])
-                    ? EventDateModel::ENDS_COUNT
-                    : EventDateModel::ENDS_UNTIL;
             }
 
             // unset denormalized properties
