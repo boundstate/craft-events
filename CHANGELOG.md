@@ -1,5 +1,10 @@
 # Release notes
 
+## 1.1.1 - 2026-08-08
+### Bug Fixes
+
+* **field:** validation for infinite repeat ([f9a5f1d](https://github.com/boundstate/eventful/commit/f9a5f1d7c630e03fe66ab1327a158ae4044b20db))
+
 ## 1.1.0 - 2026-08-08
 ### Features
 
